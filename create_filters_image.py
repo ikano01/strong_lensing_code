@@ -1,12 +1,15 @@
 from mpdaf.obj import Cube
 import matplotlib.pyplot as plt
-from astropy.table import Table
 import numpy as np
 import numpy.ma as ma
+import os
 
 def filter_im(image_name: str, band: str = None, plot_single: bool = False):
     '''
     This function creates broadband images and then saves the data from each filter as .npy files
+    
+    Example:
+        filter_im('MAGPI1201',band = 'g',plot_single = True)
     '''
     # loading in data cube
     file_name = "C:/Users/isaac/Documents/Uni 2021/Sem 2/ASTR3005/data/data_cubes/"+image_name+".fits"
@@ -21,10 +24,24 @@ def filter_im(image_name: str, band: str = None, plot_single: bool = False):
     # saving the data out of each band as numpy arrays
     save_path = 'C:/Users/isaac/Documents/Uni 2021/Sem 2/ASTR3005/data/python files/data/'+image_name
     
+    band_paths = [
+        save_path+'/SDSS_g_band/',
+        save_path+'/SDSS_r_band/',
+        save_path+'/SDSS_i_band/',
+        save_path+'/SDSS_z_band/'
+        ]
+    
+    # creating the save directory if it doesn't exist
+    for path in band_paths:
+        if os.path.exists(path) == False:
+            os.makedirs(path)
+        
+    # saving each file
     np.save(save_path+'/SDSS_g_band/SDSS_g_band_of_'+image_name+'.npy',ma.getdata(im_g))
     np.save(save_path+'/SDSS_r_band/SDSS_r_band_of_'+image_name+'.npy',ma.getdata(im_r))
     np.save(save_path+'/SDSS_i_band/SDSS_i_band_of_'+image_name+'.npy',ma.getdata(im_i))
     np.save(save_path+'/SDSS_z_band/SDSS_z_band_of_'+image_name+'.npy',ma.getdata(im_z))
+    
     
     # plotting each
     fig, axs = plt.subplots(2, 2, figsize=(15, 7))
