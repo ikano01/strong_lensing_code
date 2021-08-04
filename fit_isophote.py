@@ -6,6 +6,7 @@ from photutils.isophote import Ellipse
 from photutils.isophote import build_ellipse_model
 from photutils.isophote import EllipseSample, Isophote, IsophoteList
 from astropy.io import fits
+import time
 
 def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, vmax = 3, init_ellipse:(float,float,float,float,float) = (27, 27, 15, 0.15,30*np.pi/180)):
     '''
@@ -20,6 +21,9 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
     '''
     
     #TODO add a check to see if band and procedure strings are valid
+    
+    # time starting run
+    t_start = time.time()
     
     # path to band image
     file_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/python files/data/"+image_name+"/SDSS_"+band+"_band/SDSS_"+band+"_band_of_"+image_name+".npy"
@@ -86,10 +90,13 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
         
         # choosing a few wavelength slices to model first
         # qfits indexes from 1, so slice number 2000 in pyfits is 1999 in python
-        wavelength_indexes = [499,1999,2999]
+        wavelength_indexes = np.linspace(499,2999, 100)
+        wavelength_indexes = np.append(wavelength_indexes,1860)
         
         for wavelength_index in wavelength_indexes:
             isolist_narrow_ = []
+            # convert wavelength index to int
+            wavelength_index = round(wavelength_index)
             
             # TODO didn't work if just had [:], maybe because g.sma = 0 for this?
             for iso in isolist[1:]:
@@ -108,12 +115,15 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
                 
             # then plot the intensity profile
             # only use isolist.intens[1:] as removed first elem of isolist_narrow
-            # TODO make it so don't have to do this??
             plt.figure()
             errors = isolist_narrow.intens/isolist.intens[1:] * np.sqrt((isolist_narrow.int_err / isolist_narrow.intens)**2 + (isolist.int_err[1:] / isolist.intens[1:])**2)
             plt.errorbar(isolist_narrow.sma**0.25, (isolist_narrow.intens / isolist.intens[1:]),yerr=errors, fmt='o', markersize=4)
             plt.title("Intensity Profile of wavelength slice "+str(wavelength_index+1))
             plt.xlabel('sma**1/4')
             plt.ylabel('Ratio')
+            # can use ylim to enforce limits on y-axis to allow for better comparison
+            #plt.ylim([0,2])
             # add wavelength+1 so that wavelength of file is that as shown in qfitsview
             plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/python files/data/"+image_name+"/SDSS_"+band+"_band/Intensity_profile_wavelength_slice_"+str(wavelength_index+1)+".png")
+    t_end = time.time()
+    print('Run completed in,',t_end-t_start,'seconds!')
