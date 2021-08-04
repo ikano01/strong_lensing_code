@@ -2,16 +2,16 @@ from mpdaf.obj import Cube
 from mpdaf.obj import WCS
 import astropy.units as u
 
-def create_subcube(image_name:str, centre:(float,float), length_coord:(float,float), subtype:str = 'cube', length_axis:str = 'x'):
+def create_subcube(image_name:str, centre:[float,float], length_coord:[float,float], subtype:str = 'cube', length_axis:str = 'x'):
     '''
     This function will create and save a new subcube.
     
     MPDAF images are stored in python arrays that are indexed in [y,x] axis order
     
     Examples:
-        create_subcube('MAGPI1201', (197,197), (256,197),'y')
+        create_subcube('MAGPI1201', [197,197], [256,197],'y')
     or
-        create_subcube('MAGPI1501', (210,192), (263,192),'y')
+        create_subcube('MAGPI1501', [210,192], [263,192],'y')
     '''
     
     # load in full cube
