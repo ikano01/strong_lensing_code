@@ -9,9 +9,9 @@ def create_subcube(image_name:str, centre:[float,float], length_coord:[float,flo
     MPDAF images are stored in python arrays that are indexed in [y,x] axis order
     
     Examples:
-        create_subcube('MAGPI1201', [197,197], [256,197],'y')
+        create_subcube('MAGPI1201', [197,197], [256,197],subtype = 'cube',length_axis='y')
     or
-        create_subcube('MAGPI1501', [210,192], [263,192],'y')
+        create_subcube('MAGPI1501', [210,192], [263,192],subtype = 'cube',length_axis='y')
     '''
     
     # load in full cube
@@ -40,6 +40,8 @@ def create_subcube(image_name:str, centre:[float,float], length_coord:[float,flo
         length = abs(centre[1]-length_coord[1])
     elif length_axis == 'y':
         length = abs(centre[0]-length_coord[0])
+    else:
+        raise SyntaxError('Must specify whether to use the y or x value of the length coordinate [y,x]')
     print('Cube side length in degrees:',length)
     
     # converting length to arcseconds
@@ -55,7 +57,7 @@ def create_subcube(image_name:str, centre:[float,float], length_coord:[float,flo
         # creating circle aperature subcube
         subcube = full_cube.subcube_circle_aperture(centre,radius=length)
     else:
-        print('Must specify sub_type of either cube or circle')
+        raise SyntaxError('Must specify sub_type of either cube or circle')
         return
     
     # saving subcube
