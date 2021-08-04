@@ -7,7 +7,7 @@ from photutils.isophote import build_ellipse_model
 from photutils.isophote import EllipseSample, Isophote, IsophoteList
 from astropy.io import fits
 
-def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, vmax = 3):
+def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, vmax = 3, init_ellipse:(float,float,float,float,float) = (27, 27, 15, 0.15,30*np.pi/180)):
     '''
     This function fits isophotes to an image that has been passed through an SDSS filter
     
@@ -31,7 +31,8 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
     # following tutorials from https://photutils.readthedocs.io/en/stable/isophote.html and https://mpdaf.readthedocs.io/en/latest/cube.html
     
     # create initial guess ellipse
-    geometry = EllipseGeometry(x0=200, y0=200, sma=40, eps=0.25,pa=30*np.pi/180.)
+    # TODO MAKE IT SO CAN ENTER THESE
+    geometry = EllipseGeometry(x0=init_ellipse[0], y0=init_ellipse[1], sma=init_ellipse[2], eps=init_ellipse[3], pa=init_ellipse[4])
     
     # calculating and plotting the initial ellipse guess
     aper = EllipticalAperture((geometry.x0, geometry.y0), geometry.sma,geometry.sma*(1 - geometry.eps),geometry.pa)
