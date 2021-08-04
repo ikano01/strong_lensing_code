@@ -12,7 +12,7 @@ def filter_im(image_name: str, band: str = None, plot_single: bool = False):
         filter_im('MAGPI1201',band = 'g',plot_single = True)
     '''
     # loading in data cube
-    file_name = "C:/Users/isaac/Documents/Uni 2021/Sem 2/ASTR3005/data/data_cubes/"+image_name+".fits"
+    file_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/data_cubes/"+image_name+".fits"
     obj1 = Cube(file_name)
     
     # getting images of different bands
@@ -22,7 +22,7 @@ def filter_im(image_name: str, band: str = None, plot_single: bool = False):
     im_z = obj1.get_band_image('SDSS_z')
     
     # saving the data out of each band as numpy arrays
-    save_path = 'C:/Users/isaac/Documents/Uni 2021/Sem 2/ASTR3005/data/python files/data/'+image_name
+    save_path = 'C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/python files/data/'+image_name
     
     band_paths = [
         save_path+'/SDSS_g_band/',

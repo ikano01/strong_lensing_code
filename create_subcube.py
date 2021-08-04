@@ -14,7 +14,7 @@ def create_subcube(image_name:str, centre:(int,int),radius:int):
 
 
     # load in full cube
-    file_name = "C:/Users/isaac/Documents/Uni 2021/Sem 2/ASTR3005/data/data_cubes/"+image_name+".fits"
+    file_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/data_cubes/"+image_name+".fits"
     
     with fits.open(file_name) as hdul:
         hdul.info()
@@ -32,7 +32,7 @@ def create_subcube(image_name:str, centre:(int,int),radius:int):
     subcube = data[:,y_coord_subset,x_coord_subset]
     
     # saving subcube
-    save_name = "C:/Users/isaac/Documents/Uni 2021/Sem 2/ASTR3005/data/data_cubes/"+image_name+"_subcube.fits"
+    save_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/data_cubes/"+image_name+"_subcube.fits"
 
 
 create_subcube('MAGPI1201', (197,197), 25)

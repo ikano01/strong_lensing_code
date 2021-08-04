@@ -22,7 +22,7 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
     #TODO add a check to see if band and procedure strings are valid
     
     # path to band image
-    file_name = "C:/Users/isaac/Documents/Uni 2021/Sem 2/ASTR3005/data/python files/data/"+image_name+"/SDSS_"+band+"_band/SDSS_"+band+"_band_of_"+image_name+".npy"
+    file_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/python files/data/"+image_name+"/SDSS_"+band+"_band/SDSS_"+band+"_band_of_"+image_name+".npy"
     
     data = np.load(file_name)
     
@@ -38,7 +38,7 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
     plt.imshow(data,origin = 'lower',vmin=vmin,vmax=vmax)
     aper.plot(color='red')
     plt.title('Isophote initial guess')
-    plt.savefig("C:/Users/isaac/Documents/Uni 2021/Sem 2/ASTR3005/data/python files/data/"+image_name+"/SDSS_"+band+"_band/Isophote_initial_guess.png")
+    plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/python files/data/"+image_name+"/SDSS_"+band+"_band/Isophote_initial_guess.png")
     # calculating isophotes from that initial guesss
     ellipse = Ellipse(data, geometry=geometry)
     isolist = ellipse.fit_image()
@@ -64,23 +64,23 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
         x, y, = iso.sampled_coordinates()
         plt.plot(x,y, color='white')
     plt.title('Resulting isophote model image')
-    plt.savefig("C:/Users/isaac/Documents/Uni 2021/Sem 2/ASTR3005/data/python files/data/"+image_name+"/SDSS_"+band+"_band/Modelled_isophotes.png")
+    plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/python files/data/"+image_name+"/SDSS_"+band+"_band/Modelled_isophotes.png")
     
     plt.figure()
     plt.imshow(model_image, origin = 'lower',vmin=vmin,vmax=vmax)
     plt.title('Modelled isophotes')
-    plt.savefig("C:/Users/isaac/Documents/Uni 2021/Sem 2/ASTR3005/data/python files/data/"+image_name+"/SDSS_"+band+"_band/model_image.png")
+    plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/python files/data/"+image_name+"/SDSS_"+band+"_band/model_image.png")
     
     plt.figure()
     plt.imshow(residual, origin = 'lower',vmin=vmin,vmax=vmax)
     plt.title('The noise remove by the modelling process')
-    plt.savefig("C:/Users/isaac/Documents/Uni 2021/Sem 2/ASTR3005/data/python files/data/"+image_name+"/SDSS_"+band+"_band/noise_from_process.png")
+    plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/python files/data/"+image_name+"/SDSS_"+band+"_band/noise_from_process.png")
     
     # This code takes a while and may not be needed every time
     if procedure == 'photom':
         # from Step 7 at https://github.com/astropy/photutils-datasets/blob/main/notebooks/isophote/isophote_example4.ipynb
         
-        with fits.open("C:/Users/isaac/Documents/Uni 2021/Sem 2/ASTR3005/data/data_cubes/"+image_name+".fits") as hdu:
+        with fits.open("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/data_cubes/"+image_name+".fits") as hdu:
             cube = hdu[1].data
         
         # choosing a few wavelength slices to model first
@@ -115,4 +115,4 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
             plt.xlabel('sma**1/4')
             plt.ylabel('Ratio')
             # add wavelength+1 so that wavelength of file is that as shown in qfitsview
-            plt.savefig("C:/Users/isaac/Documents/Uni 2021/Sem 2/ASTR3005/data/python files/data/"+image_name+"/SDSS_"+band+"_band/Intensity_profile_wavelength_slice_"+str(wavelength_index+1)+".png")
+            plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/python files/data/"+image_name+"/SDSS_"+band+"_band/Intensity_profile_wavelength_slice_"+str(wavelength_index+1)+".png")
