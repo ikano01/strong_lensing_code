@@ -60,9 +60,8 @@ def filter_im(image_name: str, band: str = None, plot_single: bool = False):
             return
         
         # to plot single image
-        # globals() converts what is in [] to be a variable
-        # eg. globals()['im_'+'g'] == im_g
-        plot_im = globals()['im_'+band]
-        
-        plot_im.plot(title='SDSS_'+band,zscale = True, cmap='gray')
+        # indexing the desired band image local variable to plot
+        # eg. locals()['im_'+'g'] gives the variable im_g
+        plot_im = locals()['im_'+band]
+        plot_im.plot(title='SDSS_'+band,zscale = True)
         plt.savefig(save_path+'/SDSS_'+band+'_band/filter_image.png')
