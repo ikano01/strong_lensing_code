@@ -81,7 +81,7 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
     plt.title('The noise remove by the modelling process')
     plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/python files/data/"+image_name+"/SDSS_"+band+"_band/noise_from_process.png")
     
-    # This code takes a while and may not be needed every time
+    # this code takes a while and may not need every run so give user option
     if procedure == 'photom':
         # from Step 7 at https://github.com/astropy/photutils-datasets/blob/main/notebooks/isophote/isophote_example4.ipynb
         
@@ -90,11 +90,11 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
         
         # choosing a few wavelength slices to model first
         # qfits indexes from 1, so slice number 2000 in pyfits is 1999 in python
-        wavelength_indexes = np.linspace(499,2999, 100)
+        wavelength_indexes = np.linspace(499,2999, 10)
         wavelength_indexes = np.append(wavelength_indexes,1860)
         
         for wavelength_index in wavelength_indexes:
-            isolist_narrow_ = []
+            isolist_model_ = []
             # convert wavelength index to int
             wavelength_index = round(wavelength_index)
             
@@ -103,26 +103,38 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
                 # get the EllipseGeometry of each modelled ellipse
                 g = iso.sample.geometry
                 
-                # using the model image (just one wavelength slice for testing) so can subtract source
+                # using the model image so can subtract source
                 sample = EllipseSample(cube[wavelength_index], g.sma, geometry=g, integrmode='median', sclip=3.0, nclip=3)
                 sample.update()
                 
                 iso_ = Isophote(sample, 0, True, 0)
-                isolist_narrow_.append(iso_)
+                isolist_model_.append(iso_)
                 
                 # constructing the isophote list from the result
-                isolist_narrow = IsophoteList(isolist_narrow_)
+                isolist_model = IsophoteList(isolist_model_)
                 
             # then plot the intensity profile
-            # only use isolist.intens[1:] as removed first elem of isolist_narrow
+            # only use isolist.intens[1:] as removed first elem of isolist_model
             plt.figure()
-            errors = isolist_narrow.intens/isolist.intens[1:] * np.sqrt((isolist_narrow.int_err / isolist_narrow.intens)**2 + (isolist.int_err[1:] / isolist.intens[1:])**2)
-            plt.errorbar(isolist_narrow.sma**0.25, (isolist_narrow.intens / isolist.intens[1:]),yerr=errors, fmt='o', markersize=4)
+            
+            # if want relative intensity, use this code
+            # errors = isolist_model.intens/isolist.intens[1:] * np.sqrt((isolist_model.int_err / isolist_model.intens)**2 + (isolist.int_err[1:] / isolist.intens[1:])**2)
+            # plt.errorbar(isolist_model.sma**0.25, (isolist_model.intens / isolist.intens[1:]),yerr=errors, fmt='o', markersize=4)
+            
+            # if just want intensity use
+            # errors = isolist_model.intens * np.sqrt((isolist_model.int_err / isolist_model.intens)**2)
+            # plt.errorbar(isolist_model.sma**0.25, (isolist_model.intens),yerr=errors, fmt='o', markersize=4)
+            
+            # trying to minus the model intensity from the actual
+            errors = isolist_model.intens/isolist.intens[1:] * np.sqrt((isolist_model.int_err / isolist_model.intens)**2 + (isolist.int_err[1:] / isolist.intens[1:])**2)
+            plt.errorbar(isolist_model.sma, abs(isolist.intens[1:]-isolist_model.intens),yerr=errors, fmt='o', markersize=4)
+            
             plt.title("Intensity Profile of wavelength slice "+str(wavelength_index+1))
             plt.xlabel('sma**1/4')
             plt.ylabel('Ratio')
+            
             # can use ylim to enforce limits on y-axis to allow for better comparison
-            #plt.ylim([0,2])
+            #plt.ylim([0.4,1.3])
             # add wavelength+1 so that wavelength of file is that as shown in qfitsview
             plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/python files/data/"+image_name+"/SDSS_"+band+"_band/Intensity_profile_wavelength_slice_"+str(wavelength_index+1)+".png")
     t_end = time.time()
