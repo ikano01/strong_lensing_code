@@ -35,7 +35,6 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
     # following tutorials from https://photutils.readthedocs.io/en/stable/isophote.html and https://mpdaf.readthedocs.io/en/latest/cube.html
     
     # create initial guess ellipse
-    # TODO MAKE IT SO CAN ENTER THESE
     geometry = EllipseGeometry(x0=init_ellipse[0], y0=init_ellipse[1], sma=init_ellipse[2], eps=init_ellipse[3], pa=init_ellipse[4])
     
     # calculating and plotting the initial ellipse guess
@@ -44,6 +43,7 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
     aper.plot(color='red')
     plt.title('Isophote initial guess')
     plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/python files/data/"+image_name+"/SDSS_"+band+"_band/Isophote_initial_guess.png")
+    
     # calculating isophotes from that initial guesss
     ellipse = Ellipse(data, geometry=geometry)
     isolist = ellipse.fit_image()
@@ -56,7 +56,7 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
     plt.imshow(data, origin = 'lower',vmin=vmin,vmax=vmax)
     
     # will plot the ellipses for given sma values
-    smas = np.linspace(10,50,5)
+    smas = np.linspace(10,50,10)
     
     # also plot the largest ellipse
     smas = np.append(smas,max(isolist.sma))
@@ -125,9 +125,9 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
             # errors = isolist_model.intens * np.sqrt((isolist_model.int_err / isolist_model.intens)**2)
             # plt.errorbar(isolist_model.sma**0.25, (isolist_model.intens),yerr=errors, fmt='o', markersize=4)
             
-            # trying to minus the model intensity from the actual
+            # minus the model intensity from the actual
             errors = isolist_model.intens/isolist.intens[1:] * np.sqrt((isolist_model.int_err / isolist_model.intens)**2 + (isolist.int_err[1:] / isolist.intens[1:])**2)
-            plt.errorbar(isolist_model.sma, abs(isolist.intens[1:]-isolist_model.intens),yerr=errors, fmt='o', markersize=4)
+            plt.errorbar(isolist_model.sma, abs(isolist.intens[1:]-isolist_model.intens),yerr=errors, fmt='o-', markersize=4)
             
             plt.title("Intensity Profile of wavelength slice "+str(wavelength_index+1))
             plt.xlabel('sma**1/4')
