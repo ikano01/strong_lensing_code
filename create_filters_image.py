@@ -4,15 +4,37 @@ import numpy as np
 import numpy.ma as ma
 import os
 
-def filter_im(image_name: str, band: str = None, plot_single: bool = False):
+def filter_im(image_name: str, plot_single: bool = False, band: str = None):
     '''
-    This function creates broadband images and then saves the data from each filter as .npy files
+    This function creates broadband images 
+    and saves the data from each filter as .npy files
+    
+    Inputs:
+        image_name: str
+            A string containing the file name of the data cube fits file
+        plot_single: bool
+            Default is False, if True, plots a single image 
+            in the band specified by the band variable
+        band: str
+            Default is None, but if want to plot a single image, must specify 
+            what image band to plot. Can be 'g', 'r', 'i' or 'z'
+    
+    Output:
+        If plot_single == False:
+            For each band, saves the intensity of each pixel as a numpy array
+            Also saves a broadband image showing each filter
+        If plot_single == True:
+            Does same as above, but also saves a plot of a certain band
     
     Example:
-        filter_im('MAGPI1201',band = 'g',plot_single = True)
+        filter_im('MAGPI1201',plot_single = True, band = 'g')
+        Which saves numpy arrays of the intensity of each pixel for each band,
+        saves a broadband image of all bands 
+        and saves an image of just the 'g' band intensities
     '''
     # loading in data cube
-    file_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/data_cubes/"+image_name+".fits"
+    file_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/ \
+        data_cubes/"+image_name+".fits"
     obj1 = Cube(file_name)
     
     # getting images of different bands
@@ -22,7 +44,9 @@ def filter_im(image_name: str, band: str = None, plot_single: bool = False):
     im_z = obj1.get_band_image('SDSS_z')
     
     # saving the data out of each band as numpy arrays
-    save_path = 'C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/python files/data/'+image_name
+    # each element is the intenstity of that pixel
+    save_path = 'C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/ \
+        python files/data/'+image_name
     
     band_paths = [
         save_path+'/SDSS_g_band/',
@@ -37,10 +61,14 @@ def filter_im(image_name: str, band: str = None, plot_single: bool = False):
             os.makedirs(path)
         
     # saving each file
-    np.save(save_path+'/SDSS_g_band/SDSS_g_band_of_'+image_name+'.npy',ma.getdata(im_g))
-    np.save(save_path+'/SDSS_r_band/SDSS_r_band_of_'+image_name+'.npy',ma.getdata(im_r))
-    np.save(save_path+'/SDSS_i_band/SDSS_i_band_of_'+image_name+'.npy',ma.getdata(im_i))
-    np.save(save_path+'/SDSS_z_band/SDSS_z_band_of_'+image_name+'.npy',ma.getdata(im_z))
+    np.save(save_path+'/SDSS_g_band/SDSS_g_band_of_'+
+            image_name+'.npy',ma.getdata(im_g))
+    np.save(save_path+'/SDSS_r_band/SDSS_r_band_of_'+
+            image_name+'.npy',ma.getdata(im_r))
+    np.save(save_path+'/SDSS_i_band/SDSS_i_band_of_'+
+            image_name+'.npy',ma.getdata(im_i))
+    np.save(save_path+'/SDSS_z_band/SDSS_z_band_of_'+
+            image_name+'.npy',ma.getdata(im_z))
     
     
     # plotting each
