@@ -90,13 +90,22 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
         
         # choosing a few wavelength slices to model first
         # qfits indexes from 1, so slice number 2000 in pyfits is 1999 in python
-        wavelength_indexes = np.linspace(499,2999, 10)
+        wavelength_indexes = np.linspace(499,2999, 20)
+        
+        # if want to print all wavelengths
+        #wavelength_indexes = range(len(cube))
+        
+        # append this in testing as this is wavelength of known lense for 1501
         wavelength_indexes = np.append(wavelength_indexes,1860)
         
         for wavelength_index in wavelength_indexes:
             isolist_model_ = []
             # convert wavelength index to int
             wavelength_index = round(wavelength_index)
+            
+            # print every 100th run
+            #if wavelength_index%100 == 0:
+            #    print('Running slice',wavelength_index)
             
             # TODO didn't work if just had [:], maybe because g.sma = 0 for this?
             for iso in isolist[1:]:
@@ -125,13 +134,14 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
             # errors = isolist_model.intens * np.sqrt((isolist_model.int_err / isolist_model.intens)**2)
             # plt.errorbar(isolist_model.sma**0.25, (isolist_model.intens),yerr=errors, fmt='o', markersize=4)
             
+            
             # minus the model intensity from the actual
             errors = isolist_model.intens/isolist.intens[1:] * np.sqrt((isolist_model.int_err / isolist_model.intens)**2 + (isolist.int_err[1:] / isolist.intens[1:])**2)
-            plt.errorbar(isolist_model.sma, abs(isolist.intens[1:]-isolist_model.intens),yerr=errors, fmt='o-', markersize=4)
+            plt.errorbar(isolist_model.sma**(1/4), abs(isolist.intens[1:]-isolist_model.intens),yerr=errors, fmt='o-', markersize=4)
             
             plt.title("Intensity Profile of wavelength slice "+str(wavelength_index+1))
-            plt.xlabel('sma**1/4')
-            plt.ylabel('Ratio')
+            plt.xlabel('sma**(1/4)')
+            plt.ylabel('Intensity difference between model and data')
             
             # can use ylim to enforce limits on y-axis to allow for better comparison
             #plt.ylim([0.4,1.3])
@@ -139,3 +149,5 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
             plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/python files/data/"+image_name+"/SDSS_"+band+"_band/Intensity_profile_wavelength_slice_"+str(wavelength_index+1)+".png")
     t_end = time.time()
     print('Run completed in,',t_end-t_start,'seconds!')
+
+fit_isophote('MAGPI1501_subcube','i',procedure='photom')
