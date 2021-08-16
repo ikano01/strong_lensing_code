@@ -46,7 +46,7 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
     
     # calculating isophotes from that initial guesss
     ellipse = Ellipse(data, geometry=geometry)
-    isolist = ellipse.fit_image()
+    isolist = ellipse.fit_image(sclip=3, nclip=3)
     
     # can then print numerous isophotes for different semi-major axes
     model_image = build_ellipse_model(data.shape, isolist)
@@ -149,5 +149,3 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
             plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/python files/data/"+image_name+"/SDSS_"+band+"_band/Intensity_profile_wavelength_slice_"+str(wavelength_index+1)+".png")
     t_end = time.time()
     print('Run completed in,',t_end-t_start,'seconds!')
-
-fit_isophote('MAGPI1501_subcube','i',procedure='photom')
