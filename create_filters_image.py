@@ -33,8 +33,8 @@ def filter_im(image_name: str, plot_single: bool = False, band: str = None):
         and saves an image of just the 'g' band intensities
     '''
     # loading in data cube
-    file_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/ \
-        data_cubes/"+image_name+".fits"
+    file_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
+data_cubes/"+image_name+".fits"
     obj1 = Cube(file_name)
     
     # getting images of different bands
@@ -45,8 +45,8 @@ def filter_im(image_name: str, plot_single: bool = False, band: str = None):
     
     # saving the data out of each band as numpy arrays
     # each element is the intenstity of that pixel
-    save_path = 'C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/ \
-        python files/data/'+image_name
+    save_path = 'C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
+python files/data/'+image_name
     
     band_paths = [
         save_path+'/SDSS_g_band/',
