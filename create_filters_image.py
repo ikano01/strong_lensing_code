@@ -4,7 +4,7 @@ import numpy as np
 import numpy.ma as ma
 import os
 
-def filter_im(image_name: str, plot_single: bool = False, band: str = None):
+def filter_im(image_name: str, plot_single: bool = False, band: str = None, mask: bool = False):
     '''
     This function creates broadband images 
     and saves the data from each filter as .npy files
@@ -36,6 +36,14 @@ def filter_im(image_name: str, plot_single: bool = False, band: str = None):
     file_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
 data_cubes/"+image_name+".fits"
     obj1 = Cube(file_name)
+    
+    # masking out any galaxies or areas specified
+    if mask == True:
+        # center = centre of mask in pixel units
+        # radius = radius of mask in pixel units
+        # if float, get a cicle mask but if (float,float) get rectangle mask
+
+        obj1.mask_region(center= (15,36), radius = 2, unit_center = None, unit_radius = None)
     
     # getting images of different bands
     im_g = obj1.get_band_image('SDSS_g')
