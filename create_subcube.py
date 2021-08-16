@@ -1,6 +1,7 @@
 from mpdaf.obj import Cube
 from mpdaf.obj import WCS
 import astropy.units as u
+import matplotlib.pyplot as plt
 
 def create_subcube(image_name:str, centre:[float,float], length_coord:[float,float], subtype:str = 'cube', length_axis:str = 'x'):
     '''
@@ -12,11 +13,16 @@ def create_subcube(image_name:str, centre:[float,float], length_coord:[float,flo
         create_subcube('MAGPI1201', [197,197], [256,197],subtype = 'cube',length_axis='y')
     or
         create_subcube('MAGPI1501', [210,192], [263,192],subtype = 'cube',length_axis='y')
+    or
+        create_subcube('MAGPI1203', [197,197], [260,197],subtype = 'cube',length_axis='y')
     '''
     
     # load in full cube
     file_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/data_cubes/"+image_name+".fits"
-    full_cube = Cube(file_name)
+    full_cube = Cube(file_name)    
+    
+    
+    ### creating subcube ###
     
     # Due qfitsview to indexing from 1, need to subtract 1 from the pixel count
     centre[0] -= 1
@@ -29,6 +35,7 @@ def create_subcube(image_name:str, centre:[float,float], length_coord:[float,flo
     # converting centre into degrees
     centre = wcs.pix2sky(centre)[0]
     print('Centre in (ra,dec):',centre)
+    
     
     # converting length coordinate to degrees
     # TODO MIGHT NEED TO INPUT BOX LENGTH AS COORDINATE SO HAVE Y AND X AND THEN ONLY INPUT ONE OF THEM INTO THE SUBCUBE FUNCTION
@@ -58,9 +65,11 @@ def create_subcube(image_name:str, centre:[float,float], length_coord:[float,flo
         subcube = full_cube.subcube_circle_aperture(centre,radius=length)
     else:
         raise SyntaxError('Must specify sub_type of either cube or circle')
-        return
+        return    
     
     # saving subcube
     save_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/data_cubes/"+image_name+"_subcube.fits"
     
+    subcube.sum(axis=0).plot()
+    plt.show()
     subcube.write(save_name)
