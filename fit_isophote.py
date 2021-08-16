@@ -16,7 +16,7 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
     
         
     Example:
-        fit_isophote('MAGPI1201','i',procedure='photom')
+        fit_isophote('MAGPI1501_subcube','i',procedure='photom')
         
     '''
     
@@ -46,7 +46,7 @@ def fit_isophote(image_name: str, band: str, procedure: str = None, vmin = -3, v
     
     # calculating isophotes from that initial guesss
     ellipse = Ellipse(data, geometry=geometry)
-    isolist = ellipse.fit_image(sclip=3, nclip=3)
+    isolist = ellipse.fit_image(sclip=3.0, nclip=3)
     
     # can then print numerous isophotes for different semi-major axes
     model_image = build_ellipse_model(data.shape, isolist)
