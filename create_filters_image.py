@@ -18,6 +18,9 @@ def filter_im(image_name: str, plot_single: bool = False, band: str = None, mask
         band: str
             Default is None, but if want to plot a single image, must specify 
             what image band to plot. Can be 'g', 'r', 'i' or 'z'
+        mask: bool
+            Default is False, but if mask == True and a mask is defined in 
+            the code that region will be masked
     
     Output:
         If plot_single == False:
@@ -27,7 +30,7 @@ def filter_im(image_name: str, plot_single: bool = False, band: str = None, mask
             Does same as above, but also saves a plot of a certain band
     
     Example:
-        filter_im('MAGPI1201',plot_single = True, band = 'g')
+        filter_im('MAGPI1201',plot_single = True, band = 'g',mask = True)
         Which saves numpy arrays of the intensity of each pixel for each band,
         saves a broadband image of all bands 
         and saves an image of just the 'g' band intensities
