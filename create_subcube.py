@@ -15,6 +15,8 @@ def create_subcube(image_name:str, centre:[float,float], length_coord:[float,flo
         create_subcube('MAGPI1501', [210,192], [263,192],subtype = 'cube',length_axis='y')
     or
         create_subcube('MAGPI1203', [197,197], [260,197],subtype = 'cube',length_axis='y')
+    or
+        create_subcube('MAGPI1508', [195,200], [235,195],subtype = 'cube',length_axis='y')
     '''
     
     # load in full cube
