@@ -11,11 +11,11 @@ import time
 
 def fit_isophote(image_name: str, 
                  band: str, 
-                 create_residual_cube: bool = True, 
-                 subtract_isophotes: bool = False, 
                  vmin = -3, vmax = 3, 
                  init_ellipse:(float,float,float,float,float) 
-                 = (27, 27, 15, 0.15,30*np.pi/180)):
+                 = (27, 27, 15, 0.15,30*np.pi/180),
+                 create_residual_cube: bool = True, 
+                 subtract_isophotes: bool = False):
     '''
     This function fits isophotes to an image that has been passed through an 
     SDSS filter
@@ -25,6 +25,10 @@ def fit_isophote(image_name: str,
         
     Example:
         fit_isophote('MAGPI1501_subcube','i',subtract_isophotes = True)
+    or
+        fit_isophote('MAGPI1508_subcube','g',
+                     init_ellipse = (20, 20, 20, 0.6,-70*np.pi/180),
+                     create_residual_cube = False)
         
     '''
     
@@ -43,15 +47,15 @@ def fit_isophote(image_name: str,
     
     # path to band image
     file_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-        python files/data/"+image_name+"/SDSS_"+band+"_band/SDSS_"+band\
-            +"_band_of_"+image_name+".npy"
+python files/data/"+image_name+"/SDSS_"+band+"_band/SDSS_"+band\
++"_band_of_"+image_name+".npy"
     
     # loading in the pixel intensities
     data = np.load(file_name)
     
     # opening data cube
     with fits.open("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-                   data_cubes/"+image_name+".fits") as hdu:
+data_cubes/"+image_name+".fits") as hdu:
             
             cube = hdu[1].data
     
@@ -69,12 +73,12 @@ def fit_isophote(image_name: str,
     aper.plot(color='red')
     plt.title('Isophote initial guess')
     plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-                python files/data/"+image_name+"/SDSS_"+band+"_band/\
-                    Isophote_initial_guess.png")
+python files/data/"+image_name+"/SDSS_"+band+"_band/\
+Isophote_initial_guess.png")
     
     # calculating isophotes from that initial guesss
     ellipse = Ellipse(data, geometry=geometry)
-    isolist = ellipse.fit_image(sclip=3.0, nclip=0)
+    isolist = ellipse.fit_image(sclip=3.0, nclip=2)
     
     # print numerous isophotes for different semi-major axes
     # this creates a 2d array of the isophote model
@@ -101,22 +105,19 @@ def fit_isophote(image_name: str,
     
     plt.title('Resulting isophote model image')
     plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-                python files/data/"+image_name+"/SDSS_"+band+"_band/\
-                    Modelled_isophotes.png")
+python files/data/"+image_name+"/SDSS_"+band+"_band/Modelled_isophotes.png")
     
     plt.figure()
     plt.imshow(model_image, origin = 'lower',vmin=vmin,vmax=vmax)
     plt.title('Modelled isophotes')
     plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-                python files/data/"+image_name+"/SDSS_"+band+"_band/\
-                    model_image.png")
+python files/data/"+image_name+"/SDSS_"+band+"_band/model_image.png")
     
     plt.figure()
     plt.imshow(residual, origin = 'lower',vmin=vmin,vmax=vmax)
     plt.title('The noise removed by the modelling process')
     plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-                python files/data/"+image_name+"/SDSS_"+band+"_band/\
-                    noise_from_process.png")
+python files/data/"+image_name+"/SDSS_"+band+"_band/noise_from_process.png")
     
     
 # =============================================================================
@@ -129,15 +130,15 @@ def fit_isophote(image_name: str,
         
         # need wcs & wave values when creating cube, so get from original cube
         old_cube = Cube("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
-                        data/data_cubes/"+image_name+".fits")
+data/data_cubes/"+image_name+".fits")
         
         # creating new cube
-        new_cube = Cube(residual_cube, old_cube.wcs, old_cube.wave)
+        new_cube = Cube(data = residual_cube, wcs = old_cube.wcs, wave = old_cube.wave)
         
         # saving the cube
         new_save_path = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
-        data/python files/data/"+image_name+"/SDSS_"+band+"_band/SDSS_"+band+\
-        "_residual_image_"+image_name+".fits"
+data/python files/data/"+image_name+"/SDSS_"+band+"_band/SDSS_"+band+\
+"_residual_image_"+image_name+".fits"
         new_cube.write(new_save_path)
         print("Saved cube at",new_save_path)
     
@@ -231,9 +232,9 @@ def fit_isophote(image_name: str,
 
             # add wavelength+1 so tsame as shown in qfitsview
             plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
-                        data/python files/data/"+image_name+"/SDSS_"+band\
-                            +"_band/Intensity_profile_wavelength_slice_"\
-                                +str(wavelength_index+1)+".png")
+data/python files/data/"+image_name+"/SDSS_"+band\
++"_band/Intensity_profile_wavelength_slice_"\
++str(wavelength_index+1)+".png")
         
         
     t_end = time.time()
