@@ -35,6 +35,7 @@ def filter_im(image_name: str, plot_single: bool = False, band: str = None, mask
         saves a broadband image of all bands 
         and saves an image of just the 'g' band intensities
     '''
+    
     # loading in data cube
     file_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
 data_cubes/"+image_name+".fits"
@@ -83,7 +84,7 @@ python files/data/'+image_name
     
     
     # plotting each
-    fig, axs = plt.subplots(2, 2, figsize=(15, 7))
+    fig, axs = plt.subplots(2, 2, figsize=(7, 7))
     
     im_g.plot(ax=axs[0,0], title='SDSS_g',zscale = True)
     im_r.plot(ax=axs[0,1], title='SDSS_r',zscale = True)
