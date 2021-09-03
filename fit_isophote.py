@@ -14,7 +14,7 @@ def fit_isophote(image_name: str,
                  vmin = -3, vmax = 3, 
                  init_ellipse:(float,float,float,float,float) 
                  = (27, 27, 15, 0.15,30*np.pi/180),
-                 create_residual_cube: bool = True, 
+                 create_residual_cube: bool = False, 
                  subtract_isophotes: bool = False):
     '''
     This function fits isophotes to an image that has been passed through an 
@@ -119,123 +119,55 @@ python files/data/"+image_name+"/SDSS_"+band+"_band/model_image.png")
     plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
 python files/data/"+image_name+"/SDSS_"+band+"_band/noise_from_process.png")
     
+# =============================================================================
+#     create new model image from old isophote models but new intensities
+# =============================================================================
     
-# =============================================================================
-#     Create 3d cube of original data cube - isophote model
-# =============================================================================
-    if create_residual_cube:
-        # subtract isophote intensity model_image from all wavelength slices
-        # do model_image*len(cube) so there is one model_image for each slice
-        residual_cube = np.subtract(cube,model_image)
-        
-        # need wcs & wave values when creating cube, so get from original cube
-        old_cube = Cube("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
+    # if want to print all wavelengths
+    wavelength_indexes = range(len(cube))
+    
+    # opening original cube as Cube type
+    old_cube = Cube("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
 data/data_cubes/"+image_name+".fits")
+    
+    # create new empty cube to store residual wavelength slices
+    residual_cube = old_cube.clone(data_init = np.zeros)
+    
+    for wavelength_index in wavelength_indexes:
+        isolist_model_ = []
+        # convert wavelength index to int
+        wavelength_index = round(wavelength_index)
         
-        # creating new cube
-        new_cube = Cube(data = residual_cube, wcs = old_cube.wcs, wave = old_cube.wave)
+        # TODO didn't work if just had [:], maybe g.sma = 0 for this?
+        for iso in isolist[1:]:
+            # get the EllipseGeometry of each modelled ellipse
+            g = iso.sample.geometry
+            
+            # using the model image so can subtract source
+            sample = EllipseSample(cube[wavelength_index], g.sma, 
+                                   geometry=g, integrmode='median', 
+                                   sclip=3.0, nclip=2)
+            sample.update()
+            
+            iso_ = Isophote(sample, 0, True, 0)
+            isolist_model_.append(iso_)
+            
+            # constructing the isophote list from the result
+            isolist_model = IsophoteList(isolist_model_)
         
-        # saving the cube
-        new_save_path = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
+        # creating the image for the wavelength slice
+        # can still use data.shape as slice is still same size
+        new_slice_model_image = build_ellipse_model(data.shape,isolist_model)
+        
+        # creaing residual image for slice and saving it in blank cube
+        residual_cube[wavelength_index] = cube[wavelength_index] - new_slice_model_image
+    
+    # saving the cube
+    new_save_path = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
 data/python files/data/"+image_name+"/SDSS_"+band+"_band/SDSS_"+band+\
 "_residual_image_"+image_name+".fits"
-        new_cube.write(new_save_path)
-        print("Saved cube at",new_save_path)
+    residual_cube.write(new_save_path)
+    print("Saved cube at",new_save_path)
     
-    
-# =============================================================================
-#     Create scatter plots of isophote intensities for wavelength slices
-#
-#     From Step 7 at 
-#     https://github.com/astropy/photutils-datasets/blob/main/
-#        notebooks/isophote/isophote_example4.ipynb
-# =============================================================================
-    if subtract_isophotes:
-        
-        # choosing a few wavelength slices to model first
-        # qfits indexes from 1, so slice num 2000 in pyfits is 1999 in python
-        #wavelength_indexes = np.linspace(499,2999, 5)
-        #wavelength_indexes = np.append(wavelength_indexes,1860)
-        
-        # if want to print all wavelengths
-        wavelength_indexes = range(len(cube))
-        
-        for wavelength_index in wavelength_indexes:
-            isolist_model_ = []
-            # convert wavelength index to int
-            wavelength_index = round(wavelength_index)
-            
-            # TODO didn't work if just had [:], maybe g.sma = 0 for this?
-            for iso in isolist[1:]:
-                # get the EllipseGeometry of each modelled ellipse
-                g = iso.sample.geometry
-                
-                # using the model image so can subtract source
-                sample = EllipseSample(cube[wavelength_index], g.sma, 
-                                       geometry=g, integrmode='median', 
-                                       sclip=3.0, nclip=3)
-                sample.update()
-                
-                iso_ = Isophote(sample, 0, True, 0)
-                isolist_model_.append(iso_)
-                
-                # constructing the isophote list from the result
-                isolist_model = IsophoteList(isolist_model_)
-            
-                
-            # plotting model intensity profile
-            # use isolist.intens[1:] as removed first elem of isolist_model
-            plt.figure()
-            plt.plot(isolist_model.sma**(1/4), isolist_model.intens,'o-', 
-                     markersize=4)
-            plt.title('Model intensity profile of wavelength slice '
-                      +str(wavelength_index+1))
-            
-            # plotting measured intensity profile
-            plt.figure()
-            plt.plot(isolist_model.sma**(1/4), isolist.intens[1:],'o-', 
-                     markersize=4)
-            plt.title('Measured intensity profile of wavelength slice '
-                      +str(wavelength_index+1))
-            
-        
-            # plot the difference between model and actual intensity
-            plt.figure()
-            
-            # if want relative intensity, use this code
-            # errors = isolist_model.intens/isolist.intens[1:] * \
-            #    np.sqrt((isolist_model.int_err / isolist_model.intens)**2 \
-            #    + (isolist.int_err[1:] / isolist.intens[1:])**2)
-            # plt.errorbar(isolist_model.sma**0.25, (isolist_model.intens\
-            #    / isolist.intens[1:]),yerr=errors, fmt='o', markersize=4)
-            
-            # if just want intensity use
-            # errors = isolist_model.intens * np.sqrt((isolist_model.int_err\
-            #    / isolist_model.intens)**2)
-            # plt.errorbar(isolist_model.sma**0.25, (isolist_model.intens),
-            #yerr=errors, fmt='o', markersize=4)
-            
-            
-            # minus the model intensity from the actual
-            errors = isolist_model.intens/isolist.intens[1:] \
-                * np.sqrt((isolist_model.int_err / isolist_model.intens)**2 \
-                          + (isolist.int_err[1:] / isolist.intens[1:])**2)
-            plt.errorbar(isolist_model.sma**(1/4), isolist.intens[1:]
-                         -isolist_model.intens,yerr=errors, fmt='o-', 
-                         markersize=4)
-            
-            plt.title("Intensity Profile of wavelength slice "
-                      +str(wavelength_index+1))
-            plt.xlabel('sma**(1/4)')
-            plt.ylabel('Intensity difference between model and data')
-            
-
-            # add wavelength+1 so tsame as shown in qfitsview
-            plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
-data/python files/data/"+image_name+"/SDSS_"+band\
-+"_band/Intensity_profile_wavelength_slice_"\
-+str(wavelength_index+1)+".png")
-        
-        
     t_end = time.time()
     print('Run completed in,',t_end-t_start,'seconds!')
