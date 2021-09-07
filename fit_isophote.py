@@ -58,6 +58,9 @@ python files/data/"+image_name+"/SDSS_"+band+"_band/SDSS_"+band\
 data_cubes/"+image_name+".fits") as hdu:
             
             cube = hdu[1].data
+            
+            # this is used when creating residual_cube
+            variance = hdu[2].data
     
     # create initial guess ellipse
     geometry = EllipseGeometry(x0=init_ellipse[0], y0=init_ellipse[1], 
@@ -124,14 +127,16 @@ python files/data/"+image_name+"/SDSS_"+band+"_band/noise_from_process.png")
 # =============================================================================
     
     # if want to print all wavelengths
-    wavelength_indexes = range(len(cube))
+    #wavelength_indexes = range(len(cube))
+    wavelength_indexes = np.linspace(1859,1862,4)
     
     # opening original cube as Cube type
     old_cube = Cube("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
 data/data_cubes/"+image_name+".fits")
     
     # create new empty cube to store residual wavelength slices
-    residual_cube = old_cube.clone(data_init = np.zeros)
+    # data_init and var_init initialise hdu[1] and hdu[2] to be filled
+    residual_cube = old_cube.clone(data_init = np.zeros, var_init = np.zeros)
     
     for wavelength_index in wavelength_indexes:
         isolist_model_ = []
@@ -161,6 +166,9 @@ data/data_cubes/"+image_name+".fits")
         
         # creaing residual image for slice and saving it in blank cube
         residual_cube[wavelength_index] = cube[wavelength_index] - new_slice_model_image
+        
+        # save variance array from original subcube in residual subcube
+        residual_cube.var = variance
     
     # saving the cube
     new_save_path = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
