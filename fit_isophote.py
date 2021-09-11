@@ -13,8 +13,7 @@ def fit_isophote(image_name: str,
                  band: str, 
                  vmin = -3, vmax = 3, 
                  init_ellipse:(float,float,float,float,float) 
-                 = (27, 27, 15, 0.15,30*np.pi/180),
-                 create_residual_cube: bool = False, 
+                 = (27, 27, 15, 0.15,30*np.pi/180), 
                  subtract_isophotes: bool = False):
     '''
     This function fits isophotes to an image that has been passed through an 
@@ -26,9 +25,7 @@ def fit_isophote(image_name: str,
     Example:
         fit_isophote('MAGPI1501_subcube','i',subtract_isophotes = True)
     or
-        fit_isophote('MAGPI1508_subcube','g',
-                     init_ellipse = (20, 20, 20, 0.6,-70*np.pi/180),
-                     create_residual_cube = False)
+        fit_isophote('MAGPI1201_subcube','r',init_ellipse = (30, 30, 15, 0.15,30*np.pi/180),subtract_isophotes = False)
         
     '''
     
@@ -72,6 +69,7 @@ data_cubes/"+image_name+".fits") as hdu:
                               geometry.sma,geometry.sma*(1 - geometry.eps),
                               geometry.pa)
     
+    plt.figure()
     plt.imshow(data,origin = 'lower',vmin=vmin,vmax=vmax)
     aper.plot(color='red')
     plt.title('Isophote initial guess')
@@ -122,60 +120,65 @@ python files/data/"+image_name+"/SDSS_"+band+"_band/model_image.png")
     plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
 python files/data/"+image_name+"/SDSS_"+band+"_band/noise_from_process.png")
     
+    if not subtract_isophotes:
+        # is subtract_isophotes == False, just show the plots and nothing else
+        plt.show()
+    else:
+    # if subtract_isophotes == True, don't show plots but continue
+    
 # =============================================================================
 #     create new model image from old isophote models but new intensities
 # =============================================================================
-    
-    # if want to print all wavelengths
-    #wavelength_indexes = range(len(cube))
-    wavelength_indexes = np.linspace(1859,1862,4)
-    
-    # opening original cube as Cube type
-    old_cube = Cube("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
-data/data_cubes/"+image_name+".fits")
-    
-    # create new empty cube to store residual wavelength slices
-    # data_init and var_init initialise hdu[1] and hdu[2] to be filled
-    residual_cube = old_cube.clone(data_init = np.zeros, var_init = np.zeros)
-    
-    for wavelength_index in wavelength_indexes:
-        isolist_model_ = []
-        # convert wavelength index to int
-        wavelength_index = round(wavelength_index)
         
-        # TODO didn't work if just had [:], maybe g.sma = 0 for this?
-        for iso in isolist[1:]:
-            # get the EllipseGeometry of each modelled ellipse
-            g = iso.sample.geometry
+        # if want to print all wavelengths
+        wavelength_indexes = range(len(cube))
+        
+        # opening original cube as Cube type
+        old_cube = Cube("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
+    data/data_cubes/"+image_name+".fits")
+        
+        # create new empty cube to store residual wavelength slices
+        # data_init and var_init initialise hdu[1] and hdu[2] to be filled
+        residual_cube = old_cube.clone(data_init = np.zeros, var_init = np.zeros)
+        
+        for wavelength_index in wavelength_indexes:
+            isolist_model_ = []
+            # convert wavelength index to int
+            wavelength_index = round(wavelength_index)
             
-            # using the model image so can subtract source
-            sample = EllipseSample(cube[wavelength_index], g.sma, 
-                                   geometry=g, integrmode='median', 
-                                   sclip=3.0, nclip=2)
-            sample.update()
+            # TODO didn't work if just had [:], maybe g.sma = 0 for this?
+            for iso in isolist[1:]:
+                # get the EllipseGeometry of each modelled ellipse
+                g = iso.sample.geometry
+                
+                # using the model image so can subtract source
+                sample = EllipseSample(cube[wavelength_index], g.sma, 
+                                       geometry=g, integrmode='median', 
+                                       sclip=3.0, nclip=2)
+                sample.update()
+                
+                iso_ = Isophote(sample, 0, True, 0)
+                isolist_model_.append(iso_)
+                
+                # constructing the isophote list from the result
+                isolist_model = IsophoteList(isolist_model_)
             
-            iso_ = Isophote(sample, 0, True, 0)
-            isolist_model_.append(iso_)
+            # creating the image for the wavelength slice
+            # can still use data.shape as slice is still same size
+            new_slice_model_image = build_ellipse_model(data.shape,isolist_model)
             
-            # constructing the isophote list from the result
-            isolist_model = IsophoteList(isolist_model_)
-        
-        # creating the image for the wavelength slice
-        # can still use data.shape as slice is still same size
-        new_slice_model_image = build_ellipse_model(data.shape,isolist_model)
-        
-        # creaing residual image for slice and saving it in blank cube
-        residual_cube[wavelength_index] = cube[wavelength_index] - new_slice_model_image
-        
+            # creaing residual image for slice and saving it in blank cube
+            residual_cube[wavelength_index] = cube[wavelength_index] - new_slice_model_image
+            
         # save variance array from original subcube in residual subcube
         residual_cube.var = variance
-    
-    # saving the cube
-    new_save_path = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
-data/python files/data/"+image_name+"/SDSS_"+band+"_band/SDSS_"+band+\
-"_residual_image_"+image_name+".fits"
-    residual_cube.write(new_save_path)
-    print("Saved cube at",new_save_path)
-    
-    t_end = time.time()
-    print('Run completed in,',t_end-t_start,'seconds!')
+        
+        # saving the cube
+        new_save_path = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
+    data/python files/data/"+image_name+"/SDSS_"+band+"_band/SDSS_"+band+\
+    "_residual_image_"+image_name+".fits"
+        residual_cube.write(new_save_path)
+        print("Saved cube at",new_save_path)
+        
+        t_end = time.time()
+        print('Run completed in,',t_end-t_start,'seconds!')
