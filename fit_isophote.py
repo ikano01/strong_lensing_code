@@ -135,7 +135,7 @@ python files/data/"+image_name+"/SDSS_"+band+"_band/noise_from_process.png")
         
         # opening original cube as Cube type
         old_cube = Cube("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
-    data/data_cubes/"+image_name+".fits")
+data/data_cubes/"+image_name+".fits")
         
         # create new empty cube to store residual wavelength slices
         # data_init and var_init initialise hdu[1] and hdu[2] to be filled
@@ -175,10 +175,12 @@ python files/data/"+image_name+"/SDSS_"+band+"_band/noise_from_process.png")
         
         # saving the cube
         new_save_path = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
-    data/python files/data/"+image_name+"/SDSS_"+band+"_band/SDSS_"+band+\
-    "_residual_image_"+image_name+".fits"
+data/python files/data/"+image_name+"/SDSS_"+band+"_band/SDSS_"+band+\
+"_residual_image_"+image_name+".fits"
         residual_cube.write(new_save_path)
         print("Saved cube at",new_save_path)
         
         t_end = time.time()
         print('Run completed in,',t_end-t_start,'seconds!')
+
+#fit_isophote('MAGPI1201_subcube','r',init_ellipse = (30, 30, 15, 0.15,30*np.pi/180),subtract_isophotes = True)
