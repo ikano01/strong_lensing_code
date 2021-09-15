@@ -15,18 +15,19 @@ for line_num,possible_source in enumerate(file_lines):
     # if line doesnt start as a comment - this gets rid of headers and comment lines
     # final number in line is at [-2]
     # possible_source[-2] means not galaxy
-    if possible_source[0] != '#' and possible_source[-2] != 2:
-        # assuming max pixel num is < 1000
-        # x elem is at [16:19]
-        # y elem is at [24:27]
-        # zelem is at [33:36]
+    if possible_source[0] != '#' and possible_source[-2] != '2':
+        # assuming max pixel num is < 100
+        # x elem is at [24:26]
+        # y elem is at [33:35]
+        # z elem is at [41:45]
         
-        answer = ctypes.windll.user32.MessageBoxW(0, 'x: '+str(possible_source[16:19])+' y: '+str(possible_source[24:27])+' z: '+str(possible_source[33:36])+"Is this a galaxy \n Yes to make type 1, No for 2 and Cancel for 3", "Type "+str(possible_source[-2])+" Galaxy", 3)
+        answer = ctypes.windll.user32.MessageBoxW(0, 'x: '+str(possible_source[24:26])+' y: '+str(possible_source[33:35])+' z: '+str(possible_source[41:45])+"Is this a galaxy \n Yes to make type 1, No for 2 and Cancel for 3", "Type "+str(possible_source[-2])+" Galaxy", 3)
         # on final line of dat file, it doesn't have a \n so need to do differently
         if line_num != len(file_lines)-1:
             # if click yes (returns 6) change classification to yes a galaxy
             if answer == 6:
                 print('Yes')
+                # go up to second last element as \n is counted as 1 character
                 possible_source = possible_source[0:-2] + '1\n'
             
             # if click no (returns 7), change to not a galaxy
