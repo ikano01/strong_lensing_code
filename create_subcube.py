@@ -3,9 +3,10 @@ from mpdaf.obj import WCS
 import astropy.units as u
 import matplotlib.pyplot as plt
 
-def create_subcube(image_name:str, centre:[float,float], length_coord:[float,float], subtype:str = 'cube', length_axis:str = 'x'):
+def create_subcube(image_name:str, centre:[float,float], length_coord:[float,float], subtype:str = 'cube', length_axis:str = 'x', larger_subcube:str = False):
     '''
     This function will create and save a new subcube.
+    The option for larger_subcube = True can be set, which just changes the name of the output file so as to not affect previous smaller subcubes.
     
     MPDAF images are stored in python arrays that are indexed in [y,x] axis order
     
@@ -13,6 +14,8 @@ def create_subcube(image_name:str, centre:[float,float], length_coord:[float,flo
         create_subcube('MAGPI1201', [197,197], [256,197],subtype = 'cube',length_axis='y')
     or
         create_subcube('MAGPI1501', [210,192], [263,192],subtype = 'cube',length_axis='y')
+    or to create larger subcube cut
+        create_subcube('MAGPI1501', [210,192], [293,192],subtype = 'cube',length_axis='y', larger_subcube = True)
     or
         create_subcube('MAGPI1203', [197,197], [260,197],subtype = 'cube',length_axis='y')
     or
@@ -70,8 +73,14 @@ def create_subcube(image_name:str, centre:[float,float], length_coord:[float,flo
         return    
     
     # saving subcube
-    save_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/data_cubes/"+image_name+"_subcube.fits"
+    if larger_subcube:
+        save_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/data_cubes/"+image_name+"_larger_subcube.fits"
+    else:
+        save_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/data_cubes/"+image_name+"_subcube.fits"
     
     subcube.sum(axis=0).plot()
     plt.show()
     subcube.write(save_name)
+
+
+create_subcube('MAGPI1501', [210,192], [293,192],subtype = 'cube',length_axis='y')
