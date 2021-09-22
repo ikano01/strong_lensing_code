@@ -34,6 +34,9 @@ def filter_im(image_name: str, plot_single: bool = False, band: str = None, mask
         Which saves numpy arrays of the intensity of each pixel for each band,
         saves a broadband image of all bands 
         and saves an image of just the 'g' band intensities
+        
+        If want to create image of larger subcube can do something like
+        filter_im('MAGPI1501_larger_subcube')
     '''
     
     # loading in data cube
