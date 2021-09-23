@@ -59,22 +59,21 @@ def fit_isophote(image_name: str,
     
     
     # path to band image
+    # so larger_cube_image_name will be the name of the larger subcube if larger = True, else it will be the same as image_name
     if larger_subcube:
         # assuming image_name is 9 numbers or letters then _subcube eg. MAGPI1501_subcube
         # and the larger subcube is 9 numbers or letters then _larger_subcube eg. MAGPI1501_larger_subcube
-        larger_subcube_image_name = image_name[:9]+'_larger'+image_name[9:]
-    
-        file_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-python files/data/"+larger_subcube_image_name+"/SDSS_"+band+"_band/SDSS_"+band\
-+"_band_of_"+larger_subcube_image_name+".npy"
-        cube_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-data_cubes/"+larger_subcube_image_name+".fits"
+        larger_cube_image_name = image_name[:9]+'_larger'+image_name[9:]
     else:
-        file_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-python files/data/"+image_name+"/SDSS_"+band+"_band/SDSS_"+band\
-+"_band_of_"+image_name+".npy"
-        cube_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-data_cubes/"+image_name+".fits"
+        larger_cube_image_name = image_name
+    
+    file_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
+python files/data/"+larger_cube_image_name+"/SDSS_"+band+"_band/SDSS_"+band\
++"_band_of_"+larger_cube_image_name+".npy"
+
+
+    cube_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
+data_cubes/"+larger_cube_image_name+".fits"
     
     # loading in the pixel intensities
     data = np.load(file_name)
@@ -100,13 +99,8 @@ data_cubes/"+image_name+".fits"
     plt.title('Isophote initial guess')
     
     # saving figure
-    if larger_subcube:
-        plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-python files/data/"+larger_subcube_image_name+"/SDSS_"+band+"_band/\
-Isophote_initial_guess.png")
-    else:
-        plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-python files/data/"+image_name+"/SDSS_"+band+"_band/\
+    plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
+python files/data/"+larger_cube_image_name+"/SDSS_"+band+"_band/\
 Isophote_initial_guess.png")
     
     # calculating isophotes from that initial guesss
@@ -137,32 +131,21 @@ Isophote_initial_guess.png")
         plt.plot(x,y, color='white')
     
     plt.title('Resulting isophote model image')
-    if larger_subcube:
-        plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-python files/data/"+larger_subcube_image_name+"/SDSS_"+band+"_band/Modelled_isophotes.png")
-    else:
-        plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-python files/data/"+image_name+"/SDSS_"+band+"_band/Modelled_isophotes.png")
+    plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
+python files/data/"+larger_cube_image_name+"/SDSS_"+band+"_band/Modelled_isophotes.png")
     
     plt.figure()
     plt.imshow(model_image, origin = 'lower',vmin=vmin,vmax=vmax)
     plt.title('Modelled isophotes')
-    if larger_subcube:
-        plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-python files/data/"+larger_subcube_image_name+"/SDSS_"+band+"_band/model_image.png")
-    else:
-        plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-python files/data/"+image_name+"/SDSS_"+band+"_band/model_image.png")
+    plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
+python files/data/"+larger_cube_image_name+"/SDSS_"+band+"_band/model_image.png")
     
     plt.figure()
     plt.imshow(residual, origin = 'lower',vmin=vmin,vmax=vmax)
     plt.title('The noise removed by the modelling process')
-    if larger_subcube:
-        plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-python files/data/"+larger_subcube_image_name+"/SDSS_"+band+"_band/noise_from_process.png")
-    else:
-        plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-python files/data/"+image_name+"/SDSS_"+band+"_band/noise_from_process.png")
+
+    plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
+python files/data/"+larger_cube_image_name+"/SDSS_"+band+"_band/noise_from_process.png")
     
     if not subtract_isophotes:
         # is subtract_isophotes == False, just show the plots and nothing else
@@ -177,13 +160,13 @@ python files/data/"+image_name+"/SDSS_"+band+"_band/noise_from_process.png")
         # if want to print all wavelengths
         wavelength_indexes = range(len(cube))
         
-        # opening original cube as Cube type
-        old_cube_Cube_format = Cube("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
+        # opening subcube as Cube type
+        cube_Cube_format = Cube("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
 data/data_cubes/"+image_name+".fits")
         
         # create new empty cube to store residual wavelength slices
         # data_init and var_init initialise hdu[1] and hdu[2] to be filled
-        residual_cube = old_cube_Cube_format.clone(data_init = np.zeros, var_init = np.zeros)
+        residual_cube = cube_Cube_format.clone(data_init = np.zeros, var_init = np.zeros)
         
         # if larger_subcube = True, also need the data from the smaller 
         #subcube so can subtract the mode from as do not have it yet
@@ -218,16 +201,14 @@ data/data_cubes/"+image_name+".fits") as hdu:
                 # constructing the isophote list from the result
                 isolist_model = IsophoteList(isolist_model_)
             
-            # get the shape of the wavelength slice from the larger subcube
+            # get the shape of the wavelength slice from the larger subcube if larger_subcube = True, else just load data of subcube
             new_slice_model_image = build_ellipse_model(cube[wavelength_index].shape,isolist_model)
             
-            # [dist_in:(len(cube[0])-dist_in),dist_in:(len(cube[0])-dist_in)] is so crop larger cube to same size as smaller cube
-            new_slice_model_image = new_slice_model_image[dist_in:(len(cube[0])-dist_in),dist_in:(len(cube[0])-dist_in)]
-            
             # creaing residual image for slice and saving it in blank cube
-            # if larger_subcube = True, subtract new_slice_model_image 
-            # from original smaller subcube
             if larger_subcube:
+                # [dist_in:(len(cube[0])-dist_in),dist_in:(len(cube[0])-dist_in)] is so crop model of larger subcube to same size as subcube
+                new_slice_model_image = new_slice_model_image[dist_in:(len(cube[0])-dist_in),dist_in:(len(cube[0])-dist_in)]
+            
                 residual_cube[wavelength_index] = old_cube[wavelength_index] - new_slice_model_image
             else:
                 residual_cube[wavelength_index] = cube[wavelength_index] - new_slice_model_image
