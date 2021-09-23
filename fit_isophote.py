@@ -178,46 +178,37 @@ python files/data/"+image_name+"/SDSS_"+band+"_band/noise_from_process.png")
         wavelength_indexes = range(len(cube))
         
         # opening original cube as Cube type
-        old_cube = Cube("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
+        old_cube_Cube_format = Cube("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
 data/data_cubes/"+image_name+".fits")
         
         # create new empty cube to store residual wavelength slices
         # data_init and var_init initialise hdu[1] and hdu[2] to be filled
-        residual_cube = old_cube.clone(data_init = np.zeros, var_init = np.zeros)
+        residual_cube = old_cube_Cube_format.clone(data_init = np.zeros, var_init = np.zeros)
         
         # if larger_subcube = True, also need the data from the smaller 
         #subcube so can subtract the mode from as do not have it yet
         if larger_subcube:
             with fits.open("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
 data/data_cubes/"+image_name+".fits") as hdu:
-                smaller_cube = hdu[1].data
+                old_cube = hdu[1].data
         
         for wavelength_index in wavelength_indexes:
             isolist_model_ = []
             # convert wavelength index to int
             wavelength_index = round(wavelength_index)
             
+            # distance to crop larger cube to make it same as smaller cube
+            # want length of just one cube slice
+            dist_in = round((len(cube[0])-len(old_cube[0]))/2)
+            
             # TODO didn't work if just had [:], maybe g.sma = 0 for this?
             for iso in isolist[1:]:
                 # get the EllipseGeometry of each modelled ellipse
                 g = iso.sample.geometry
-                
                 # using the model image so can subtract source
-                # if larger_subcube = True, only want a part of the cube array
-                # as the larger subcube is bigger
-                
-                if larger_subcube:
-                    # distance to crop larger cube to make it same as smaller cube
-                    dist_in = round((len(cube)-len(smaller_cube))/2)
-                    # then the amount to crop the large cube slice is
-                    cropped_large_size = cube[wavelength_index][dist_in:(len(cube)-dist_in-1),dist_in:(len(cube)-dist_in-1)]
-                    sample = EllipseSample(cropped_large_size, g.sma, 
-                                           geometry=g, integrmode='median', 
-                                           sclip=sclip_val, nclip=nclip_val,astep=step_val)
-                else:
-                    sample = EllipseSample(cube[wavelength_index], g.sma, 
-                                           geometry=g, integrmode='median', 
-                                           sclip=sclip_val, nclip=nclip_val,astep=step_val)
+                sample = EllipseSample(cube[wavelength_index], g.sma, 
+                                       geometry=g, integrmode='median', 
+                                       sclip=sclip_val, nclip=nclip_val,astep=step_val)
                 
                 sample.update()
                 
@@ -227,15 +218,17 @@ data/data_cubes/"+image_name+".fits") as hdu:
                 # constructing the isophote list from the result
                 isolist_model = IsophoteList(isolist_model_)
             
-            # creating the image for the wavelength slice
-            # get the shape of the wavelength slice from the old_cube
-            new_slice_model_image = build_ellipse_model(old_cube.data[wavelength_index].shape,isolist_model)
+            # get the shape of the wavelength slice from the larger subcube
+            new_slice_model_image = build_ellipse_model(cube[wavelength_index].shape,isolist_model)
+            
+            # [dist_in:(len(cube[0])-dist_in),dist_in:(len(cube[0])-dist_in)] is so crop larger cube to same size as smaller cube
+            new_slice_model_image = new_slice_model_image[dist_in:(len(cube[0])-dist_in),dist_in:(len(cube[0])-dist_in)]
             
             # creaing residual image for slice and saving it in blank cube
             # if larger_subcube = True, subtract new_slice_model_image 
             # from original smaller subcube
             if larger_subcube:
-                residual_cube[wavelength_index] = smaller_cube[wavelength_index] - new_slice_model_image
+                residual_cube[wavelength_index] = old_cube[wavelength_index] - new_slice_model_image
             else:
                 residual_cube[wavelength_index] = cube[wavelength_index] - new_slice_model_image
             
@@ -257,3 +250,5 @@ data/python files/data/"+image_name+"/SDSS_"+band+"_band/SDSS_"+band+\
         
         t_end = time.time()
         print('Run completed in,',t_end-t_start,'seconds!')
+
+fit_isophote('MAGPI1501_subcube','i',init_ellipse = (42, 42, 15, 0.15,30*np.pi/180),subtract_isophotes = True, larger_subcube = True)
