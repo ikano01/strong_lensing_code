@@ -13,7 +13,7 @@ def fit_isophote(image_name: str,
                  band: str, 
                  vmin = -3, vmax = 3, 
                  init_ellipse:(float,float,float,float,float) 
-                 = (27, 27, 15, 0.15,30*np.pi/180), 
+                 = (27, 27, 15, 0.15,30), 
                  fit_isophote_guess: bool = False,
                  sclip_val=3.0, 
                  nclip_val=2, 
@@ -34,9 +34,9 @@ def fit_isophote(image_name: str,
     Example:
         fit_isophote('MAGPI1501_subcube','i',fit_isophote_guess = True)
     or to create the isophote models from a larger subcube
-        fit_isophote('MAGPI1501_subcube','i',init_ellipse = (42, 42, 15, 0.15,30*np.pi/180),fit_isophote_guess = True, larger_subcube = True)
+        fit_isophote('MAGPI1501_subcube','i',init_ellipse = (42, 42, 15, 0.15,30),fit_isophote_guess = True, larger_subcube = True)
     or
-        fit_isophote('MAGPI1201_subcube','r',init_ellipse = (30, 30, 15, 0.15,30*np.pi/180),fit_isophote_guess = False)
+        fit_isophote('MAGPI1201_subcube','r',init_ellipse = (30, 30, 15, 0.15,30),fit_isophote_guess = False)
         
     '''
     
@@ -86,7 +86,7 @@ data_cubes/"+larger_cube_image_name+".fits"
     # create initial guess ellipse
     geometry = EllipseGeometry(x0=init_ellipse[0], y0=init_ellipse[1], 
                                sma=init_ellipse[2], eps=init_ellipse[3], 
-                               pa=init_ellipse[4])
+                               pa=np.deg2rad(init_ellipse[4]))
     
     # calculating and plotting the initial ellipse guess
     aper = EllipticalAperture((geometry.x0, geometry.y0), 
