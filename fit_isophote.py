@@ -14,7 +14,7 @@ def fit_isophote(image_name: str,
                  vmin = -3, vmax = 3, 
                  init_ellipse:(float,float,float,float,float) 
                  = (27, 27, 15, 0.15,30*np.pi/180), 
-                 subtract_isophotes: bool = False,
+                 fit_isophote_guess: bool = False,
                  sclip_val=3.0, 
                  nclip_val=2, 
                  step_val=0.1,
@@ -32,11 +32,11 @@ def fit_isophote(image_name: str,
     
         
     Example:
-        fit_isophote('MAGPI1501_subcube','i',subtract_isophotes = True)
+        fit_isophote('MAGPI1501_subcube','i',fit_isophote_guess = True)
     or to create the isophote models from a larger subcube
-        fit_isophote('MAGPI1501_subcube','i',init_ellipse = (42, 42, 15, 0.15,30*np.pi/180),subtract_isophotes = True, larger_subcube = True)
+        fit_isophote('MAGPI1501_subcube','i',init_ellipse = (42, 42, 15, 0.15,30*np.pi/180),fit_isophote_guess = True, larger_subcube = True)
     or
-        fit_isophote('MAGPI1201_subcube','r',init_ellipse = (30, 30, 15, 0.15,30*np.pi/180),subtract_isophotes = False)
+        fit_isophote('MAGPI1201_subcube','r',init_ellipse = (30, 30, 15, 0.15,30*np.pi/180),fit_isophote_guess = False)
         
     '''
     
@@ -102,56 +102,59 @@ data_cubes/"+larger_cube_image_name+".fits"
     plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
 python files/data/"+larger_cube_image_name+"/SDSS_"+band+"_band/\
 Isophote_initial_guess.png")
-    
-    # calculating isophotes from that initial guesss
-    ellipse = Ellipse(data, geometry=geometry)
-    isolist = ellipse.fit_image(sclip=sclip_val, nclip=nclip_val,step=step_val)
-    
-    # print numerous isophotes for different semi-major axes
-    # this creates a 2d array of the isophote model
-    model_image = build_ellipse_model(data.shape, isolist)
-    
-    residual = data - model_image
-    
-    plt.figure()
-    plt.imshow(data, origin = 'lower',vmin=vmin,vmax=vmax)
-    
-    # will plot ellipses for given sma values
-    smas = np.linspace(5,200,100)
-    
-    # also include largest ellipse
-    smas = np.append(smas,max(isolist.sma))
-    
-    print('Plotting isophotes with sma of: \n',smas)
-    
-    # plotting the isophote ellipses
-    for sma in smas:
-        iso = isolist.get_closest(sma)
-        x, y, = iso.sampled_coordinates()
-        plt.plot(x,y, color='white')
-    
-    plt.title('Resulting isophote model image')
-    plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-python files/data/"+larger_cube_image_name+"/SDSS_"+band+"_band/Modelled_isophotes.png")
-    
-    plt.figure()
-    plt.imshow(model_image, origin = 'lower',vmin=vmin,vmax=vmax)
-    plt.title('Modelled isophotes')
-    plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-python files/data/"+larger_cube_image_name+"/SDSS_"+band+"_band/model_image.png")
-    
-    plt.figure()
-    plt.imshow(residual, origin = 'lower',vmin=vmin,vmax=vmax)
-    plt.title('The noise removed by the modelling process')
 
-    plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-python files/data/"+larger_cube_image_name+"/SDSS_"+band+"_band/noise_from_process.png")
-    
-    if not subtract_isophotes:
-        # is subtract_isophotes == False, just show the plots and nothing else
+
+    if not fit_isophote_guess:
+        # is fit_isophote_guess == False, just show the plots and nothing else
         plt.show()
     else:
-    # if subtract_isophotes == True, don't show plots but continue
+    # if fit_isophote_guess == True, don't show plots but continue
+    
+        # calculating isophotes from that initial guesss
+        ellipse = Ellipse(data, geometry=geometry)
+        isolist = ellipse.fit_image(sclip=sclip_val, nclip=nclip_val,step=step_val)
+        
+        # print numerous isophotes for different semi-major axes
+        # this creates a 2d array of the isophote model
+        model_image = build_ellipse_model(data.shape, isolist)
+        
+        residual = data - model_image
+        
+        plt.figure()
+        plt.imshow(data, origin = 'lower',vmin=vmin,vmax=vmax)
+        
+        # will plot ellipses for given sma values
+        smas = np.linspace(5,200,100)
+        
+        # also include largest ellipse
+        smas = np.append(smas,max(isolist.sma))
+        
+        print('Plotting isophotes with sma of: \n',smas)
+        
+        # plotting the isophote ellipses
+        for sma in smas:
+            iso = isolist.get_closest(sma)
+            x, y, = iso.sampled_coordinates()
+            plt.plot(x,y, color='white')
+        
+        plt.title('Resulting isophote model image')
+        plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
+    python files/data/"+larger_cube_image_name+"/SDSS_"+band+"_band/Modelled_isophotes.png")
+        
+        plt.figure()
+        plt.imshow(model_image, origin = 'lower',vmin=vmin,vmax=vmax)
+        plt.title('Modelled isophotes')
+        plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
+    python files/data/"+larger_cube_image_name+"/SDSS_"+band+"_band/model_image.png")
+        
+        plt.figure()
+        plt.imshow(residual, origin = 'lower',vmin=vmin,vmax=vmax)
+        plt.title('The noise removed by the modelling process')
+
+        plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
+    python files/data/"+larger_cube_image_name+"/SDSS_"+band+"_band/noise_from_process.png")
+        
+
     
 # =============================================================================
 #     create new model image from old isophote models but new intensities
@@ -180,9 +183,11 @@ data/data_cubes/"+image_name+".fits") as hdu:
             # convert wavelength index to int
             wavelength_index = round(wavelength_index)
             
-            # distance to crop larger cube to make it same as smaller cube
-            # want length of just one cube slice
-            dist_in = round((len(cube[0])-len(old_cube[0]))/2)
+            # if larger_subcube == True also need to find distance to crop the larger subcube
+            if larger_subcube:
+                # distance to crop larger cube to make it same as smaller cube
+                # want length of just one cube slice
+                dist_in = round((len(cube[0])-len(old_cube[0]))/2)
             
             # TODO didn't work if just had [:], maybe g.sma = 0 for this?
             for iso in isolist[1:]:
@@ -231,5 +236,3 @@ data/python files/data/"+image_name+"/SDSS_"+band+"_band/SDSS_"+band+\
         
         t_end = time.time()
         print('Run completed in,',t_end-t_start,'seconds!')
-
-fit_isophote('MAGPI1501_subcube','i',init_ellipse = (42, 42, 15, 0.15,30*np.pi/180),subtract_isophotes = True, larger_subcube = True)
