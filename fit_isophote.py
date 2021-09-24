@@ -12,7 +12,7 @@ import time
 def fit_isophote(image_name: str, 
                  band: str, 
                  vmin = -3, vmax = 3, 
-                 init_ellipse:(float,float,float,float,float) 
+                 init_ellipse:[float,float,float,float,float]
                  = (27, 27, 15, 0.15,30), 
                  fit_isophote_guess: bool = False,
                  sclip_val=3.0, 
@@ -139,20 +139,20 @@ Isophote_initial_guess.png")
         
         plt.title('Resulting isophote model image')
         plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-    python files/data/"+larger_cube_image_name+"/SDSS_"+band+"_band/Modelled_isophotes.png")
+python files/data/"+larger_cube_image_name+"/SDSS_"+band+"_band/Modelled_isophotes.png")
         
         plt.figure()
         plt.imshow(model_image, origin = 'lower',vmin=vmin,vmax=vmax)
         plt.title('Modelled isophotes')
         plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-    python files/data/"+larger_cube_image_name+"/SDSS_"+band+"_band/model_image.png")
+python files/data/"+larger_cube_image_name+"/SDSS_"+band+"_band/model_image.png")
         
         plt.figure()
         plt.imshow(residual, origin = 'lower',vmin=vmin,vmax=vmax)
         plt.title('The noise removed by the modelling process')
 
         plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
-    python files/data/"+larger_cube_image_name+"/SDSS_"+band+"_band/noise_from_process.png")
+python files/data/"+larger_cube_image_name+"/SDSS_"+band+"_band/noise_from_process.png")
         
 
     
