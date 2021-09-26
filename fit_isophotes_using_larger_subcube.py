@@ -22,7 +22,7 @@ def run(cube_name,centre_coord,length_coord,length_axis, pixels_larger,init_elli
         SN_threshold: int is the signal to noise threshold that counts as a detection within the LSDCat processing steps
         
         eg.
-        run('MAGPI1201',[197,197], [256,197],length_axis='y', [286,197],(30, 30, 15, 0.15,30*np.pi/180),check_init_ellipse = True)
+        run('MAGPI1201',[197,197], [256,197],length_axis='y', 30,(30, 30, 15, 0.15,30*np.pi/180),check_init_ellipse = True)
     '''
 
     # create subcube
@@ -30,9 +30,9 @@ def run(cube_name,centre_coord,length_coord,length_axis, pixels_larger,init_elli
 
     # create larger subcube
     if length_axis == 'x':
-        larger_subcube_length_coord = [length_coord[0],length_coord[1]+pixels_larger[0]]
+        larger_subcube_length_coord = [length_coord[0],length_coord[1]+pixels_larger]
     else:
-        larger_subcube_length_coord = [length_coord[1]+pixels_larger[1],length_coord[0]]
+        larger_subcube_length_coord = [length_coord[1]+pixels_larger,length_coord[0]]
     
     create_subcube(cube_name, centre_coord, larger_subcube_length_coord,subtype = 'cube',length_axis=length_axis, larger_subcube = True)
 
@@ -61,4 +61,4 @@ def run(cube_name,centre_coord,length_coord,length_axis, pixels_larger,init_elli
     run_LSDCat(cube_name+'_subcube',band,SN_threshold)
     
 
-run('MAGPI1205',[190,200], [227,200],'y', [233,200],[105, 105, 20, 0.1,300],check_init_ellipse = True,band='r', SN_threshold = 10)
+run('MAGPI1202',[195,198], [195,239],'x', 30,[35, 35, 30, 0.6,30],check_init_ellipse = True,band='r', SN_threshold = 10)
