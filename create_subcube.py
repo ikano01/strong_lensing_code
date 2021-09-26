@@ -81,6 +81,3 @@ def create_subcube(image_name:str, centre:[float,float], length_coord:[float,flo
     subcube.sum(axis=0).plot()
     plt.show()
     subcube.write(save_name)
-
-
-create_subcube('MAGPI1501', [210,192], [293,192],subtype = 'cube',length_axis='y')
