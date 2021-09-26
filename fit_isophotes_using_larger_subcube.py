@@ -1,11 +1,12 @@
 from create_subcube import create_subcube
 from create_filters_image import filter_im
 from fit_isophote import fit_isophote
+from run_LSDCat import run_LSDCat
 import numpy as np
 
 ### code to fit isophote to larger subcube and then copy onto a smaller cube ###
 
-def run(cube_name,centre_coord,length_coord,length_axis, pixels_larger,init_ellipse,check_init_ellipse,band):
+def run(cube_name,centre_coord,length_coord,length_axis, pixels_larger,init_ellipse,check_init_ellipse,band,SN_threshold):
     '''
     Inputs:
         cube_name:str is the name of the downloaded full cube
@@ -18,6 +19,7 @@ def run(cube_name,centre_coord,length_coord,length_axis, pixels_larger,init_elli
             the initial ellipse given will be plotted on the larger subcube image so that the fit can be checked. The user can then decide to re-define the ellipse or 
             to continue running the simulation
         band:str is the band to run the isophote fit on
+        SN_threshold: int is the signal to noise threshold that counts as a detection within the LSDCat processing steps
         
         eg.
         run('MAGPI1201',[197,197], [256,197],length_axis='y', [286,197],(30, 30, 15, 0.15,30*np.pi/180),check_init_ellipse = True)
@@ -55,7 +57,8 @@ def run(cube_name,centre_coord,length_coord,length_axis, pixels_larger,init_elli
     # fit the isophotes using the larger subcube as a base to build the models
     fit_isophote(cube_name+'_subcube',band,init_ellipse = init_ellipse,fit_isophote_guess = True, larger_subcube = True)
     
-    # TODO add in ability to run LSDCat commands eg.
-    # os.system('python ../../../../../lsdcat/lsd_cc_spatial.py --gaussian -pc 0.5 -S 1 -N 2 -t 1 -i SDSS_i_residual_image_MAGPI1501_subcube.fits -o MAGPI1501_i_subcube_spatial.fits')
+    # process the cube using the LSDCat files
+    run_LSDCat(cube_name+'_subcube',band,SN_threshold)
+    
 
-run('MAGPI1201',[197,197], [256,197],'y', [286,197],[30, 30, 15, 0.15,30],check_init_ellipse = True,band='r')
+run('MAGPI1205',[190,200], [227,200],'y', [233,200],[105, 105, 20, 0.1,300],check_init_ellipse = True,band='r', SN_threshold = 10)
