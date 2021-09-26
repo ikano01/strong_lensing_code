@@ -3,10 +3,16 @@ import ctypes
 # load in the .dat file
 file_name = 'C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
 python files/data/MAGPI1501_subcube/SDSS_i_band/\
-SDSS_i_residual_image_MAGPI1501_subcube_MAGPI1501_i_subcube_LSDCat_IKA_class - Copy.dat'
+SDSS_i_residual_image_MAGPI1501_subcube_MAGPI1501_i_subcube_LSDCat_IKA_class.dat'
 file_name = 'C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
 python files/data/MAGPI1201_subcube/SDSS_r_band/\
-SDSS_r_residual_image_MAGPI1201_subcube_MAGPI1201_r_subcube_LSDCat_IKA_class - Copy.dat'
+SDSS_r_residual_image_MAGPI1201_subcube_MAGPI1201_r_subcube_LSDCat_IKA_class.dat'
+file_name = 'C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
+python files/data/MAGPI1508_subcube/SDSS_r_band/\
+SDSS_r_residual_image_MAGPI1508_subcube_MAGPI1508_r_subcube_LSDCat_IKA_class.dat'
+file_name = 'C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
+python files/data/MAGPI1202_subcube/SDSS_r_band/\
+SDSS_r_residual_image_MAGPI1202_subcube_MAGPI1202_subcube_r_LSDCat_IKA_class.dat'
 
 ### ONLY USE WITH COPY OF FILE JUST IN CASE ###
 
