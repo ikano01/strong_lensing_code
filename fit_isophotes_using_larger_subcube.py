@@ -10,8 +10,8 @@ def run(cube_name,centre_coord,length_coord,length_axis, pixels_larger,init_elli
     '''
     Inputs:
         cube_name:str is the name of the downloaded full cube
-        centre_coord:[float,float] is the coordinate of the centre of the lens galaxy where coordinates are expressed [y,x]
-        length_coord:[float,float] is the coordinate of the distance to cut to, either vertically or horizontally from the centre_coord depending if length_axis is 'x' or 'y'
+        centre_coord:[int,int] is the coordinate of the centre of the lens galaxy where coordinates are expressed [y,x]
+        length_coord:[int,int] is the coordinate of the distance to cut to, either vertically or horizontally from the centre_coord depending if length_axis is 'x' or 'y'
         length_axis:str can be either 'y' if the length_coord is vertical from the centre_coord or 'x' if the length_coord is horizontal from the centre_coord
         pixels_larger:int is the number of pixels larger the larger subcube should be from the length_coord
         init_ellipse: (int,int,int,float,float) is the equestion for the initial ellipse guess for the larger subcube
@@ -22,19 +22,16 @@ def run(cube_name,centre_coord,length_coord,length_axis, pixels_larger,init_elli
         SN_threshold: int is the signal to noise threshold that counts as a detection within the LSDCat processing steps
         
         eg.
-        run('MAGPI1201',[197,197], [256,197],length_axis='y', 30,(30, 30, 15, 0.15,30*np.pi/180),check_init_ellipse = True)
+        run('MAGPI1201',[197,197], [256,197],length_axis='y', 30,(30, 30, 15, 0.15,30),check_init_ellipse = True,band='g', SN_threshold = 10)
+        or
+        run('MAGPI1203',[196,196], [196,261],'x', 20,[45, 45, 15, 0.1,0],check_init_ellipse = True,band='g', SN_threshold = 10)
     '''
 
     # create subcube
     create_subcube(cube_name, centre_coord, length_coord,subtype = 'cube',length_axis=length_axis)
-
-    # create larger subcube
-    if length_axis == 'x':
-        larger_subcube_length_coord = [length_coord[0],length_coord[1]+pixels_larger]
-    else:
-        larger_subcube_length_coord = [length_coord[1]+pixels_larger,length_coord[0]]
     
-    create_subcube(cube_name, centre_coord, larger_subcube_length_coord,subtype = 'cube',length_axis=length_axis, larger_subcube = True)
+    # create larger subcube
+    create_subcube(cube_name, centre_coord, length_coord,subtype = 'cube',length_axis=length_axis, larger_subcube = True,pixels_larger = pixels_larger)
 
     # create filters image of both cubes
     filter_im(cube_name+'_subcube')
@@ -61,4 +58,4 @@ def run(cube_name,centre_coord,length_coord,length_axis, pixels_larger,init_elli
     run_LSDCat(cube_name+'_subcube',band,SN_threshold)
     
 
-run('MAGPI1202',[195,198], [195,239],'x', 30,[35, 35, 30, 0.6,30],check_init_ellipse = True,band='r', SN_threshold = 10)
+run('MAGPI1201',[197,197], [197,260],'x', 30,(45, 45, 15, 0.15,30),check_init_ellipse = True,band='g', SN_threshold = 10)
