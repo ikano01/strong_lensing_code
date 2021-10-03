@@ -132,4 +132,4 @@ def create_subcube(image_name:str, centre:[int,int], length_coord:[int,int], sub
     
     subcube.sum(axis=0).plot()
     plt.show()
-    #subcube.write(save_name,savemask='nan')
+    subcube.write(save_name,savemask='nan')
