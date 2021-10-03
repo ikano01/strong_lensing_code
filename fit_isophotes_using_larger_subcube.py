@@ -6,13 +6,17 @@ import numpy as np
 
 ### code to fit isophote to larger subcube and then copy onto a smaller cube ###
 
-def run(cube_name,centre_coord,length_coord,length_axis, pixels_larger,init_ellipse,check_init_ellipse,band,SN_threshold):
+def run(cube_name,centre_coord,length_coord,length_axis, mask_cube = False, mask_centres = [], mask_extents = [],
+    pixels_larger,init_ellipse,check_init_ellipse,band,SN_threshold):
     '''
     Inputs:
         cube_name:str is the name of the downloaded full cube
         centre_coord:[int,int] is the coordinate of the centre of the lens galaxy where coordinates are expressed [y,x]
         length_coord:[int,int] is the coordinate of the distance to cut to, either vertically or horizontally from the centre_coord depending if length_axis is 'x' or 'y'
         length_axis:str can be either 'y' if the length_coord is vertical from the centre_coord or 'x' if the length_coord is horizontal from the centre_coord
+        mask_cube:bool if True adds a mask to the subcube
+        mask_centres:list is a list of lists which each correspond to the [y,x] centre of a mask to be placed on the full cube
+        mask_extents:list is a list of lists which each correspond to the [y,x] extents of the mask to be placed on the full cube
         pixels_larger:int is the number of pixels larger the larger subcube should be from the length_coord
         init_ellipse: (int,int,int,float,float) is the equestion for the initial ellipse guess for the larger subcube
         check_init_ellipse: bool if check_init_ellipse == True, the isophotes will not be subtracted straight away and instead 
@@ -26,12 +30,14 @@ def run(cube_name,centre_coord,length_coord,length_axis, pixels_larger,init_elli
         or
         run('MAGPI1203',[196,196], [196,261],'x', 20,[45, 45, 15, 0.1,0],check_init_ellipse = True,band='g', SN_threshold = 10)
     '''
-
+    # if the cube should be masked maskmask_cube == True
     # create subcube
-    create_subcube(cube_name, centre_coord, length_coord,subtype = 'cube',length_axis=length_axis)
+    create_subcube(cube_name, centre_coord, length_coord,subtype = 'cube',length_axis=length_axis, 
+        mask_cube = mask_cube, mask_centres = mask_centres,mask_extents = mask_extents)
     
     # create larger subcube
-    create_subcube(cube_name, centre_coord, length_coord,subtype = 'cube',length_axis=length_axis, larger_subcube = True,pixels_larger = pixels_larger)
+    create_subcube(cube_name, centre_coord, length_coord,subtype = 'cube',length_axis=length_axis, larger_subcube = True, 
+        pixels_larger = pixels_larger, mask_cube = mask_cube, mask_centres = mask_centres,mask_extents = mask_extents)
 
     # create filters image of both cubes
     filter_im(cube_name+'_subcube')
