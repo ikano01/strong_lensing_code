@@ -3,7 +3,7 @@ from mpdaf.obj import WCS
 import astropy.units as u
 import matplotlib.pyplot as plt
 
-def create_subcube(image_name:str, centre:[int,int], length_coord:[int,int], subtype:str = 'cube', length_axis:str = 'x', 
+def create_subcube(image_name:str, centre:[int,int], length:[int,int], subtype:str = 'cube', length_axis:str = 'x', 
     mask_cube:bool = False, larger_subcube:bool = False, pixels_larger:int = 0, mask_centres:list = [], mask_extents:list = []):
     '''
     This function will create and save a new subcube.
@@ -42,18 +42,38 @@ def create_subcube(image_name:str, centre:[int,int], length_coord:[int,int], sub
     
     ### creating subcube ###
     
+    # initialising centre_coord and length arrays
+    centre_coord = [0,0]
+    length_coord = [0,0]
+    
     # Due qfitsview to indexing from 1, need to subtract 1 from the pixel count
-    centre[0] -= 1
-    centre[1] -= 1
-    length_coord[0] -= 1
-    length_coord[1] -= 1
+    centre_coord[0] = centre[0] - 1
+    centre_coord[1] = centre[1] - 1
+    length_coord[0] = length[0] - 1
+    length_coord[1] = length[1] - 1
     
     # Instancing the WCS class, which deals with world coordinates
     wcs = WCS(full_cube.get_wcs_header())
     # converting centre into degrees
-    centre_deg = wcs.pix2sky(centre)[0]
+    centre_deg = wcs.pix2sky(centre_coord)[0]
     print('Centre in (ra,dec):',centre_deg)
     
+    # if larger_subcube, want to make length pixels_larger bigger
+    # TODO fix, I don't think this works? Because what if pixel is below the object
+    # then the += would mean it would be less distance from the centre?
+    if larger_subcube:
+        if length_axis == 'x':
+            # want to make length_coord[1] pixels_larger further from the centre
+            if length_coord[1] > centre_coord[1]:
+                length_coord[1] += pixels_larger
+            else:
+                length_coord[1] -= pixels_larger
+        else:
+            # want to make length_coord[0] pixels_larger further from the centre
+            if length_coord[0] > centre_coord[0]:
+                length_coord[0] += pixels_larger
+            else:
+                length_coord[0] -= pixels_larger
     
     # converting length coordinate to degrees
     # had to index [0] because wcs.pix2sky output the coordinates in a second list, eg. [[y,x]]
@@ -61,18 +81,10 @@ def create_subcube(image_name:str, centre:[int,int], length_coord:[int,int], sub
     
     # getting the length in degrees by subtracting y-degree (or x) of centre_deg with y-degree (or x) of length_coord_deg
     if length_axis == 'x':
-        if larger_subcube:
-            # if larger_subcube, want to make length pixels_larger bigger
-            length = abs(centre_deg[1]-length_coord_deg[1])+2*pixels_larger
-        else:
-            length = abs(centre_deg[1]-length_coord_deg[1])
+        length = abs(centre_deg[1]-length_coord_deg[1])
         
     elif length_axis == 'y':
-        # if larger_subcube, want to make length pixels_larger bigger
-        if larger_subcube:
-            length = abs(centre_deg[0]-length_coord_deg[0])+2*pixels_larger
-        else:
-            length = abs(centre_deg[0]-length_coord_deg[0])
+        length = abs(centre_deg[0]-length_coord_deg[0])
         
     else:
         raise SyntaxError('Must specify whether to use the y or x value of the length coordinate [y,x]')
@@ -104,24 +116,27 @@ def create_subcube(image_name:str, centre:[int,int], length_coord:[int,int], sub
             # the pixel shift is the difference between the centre full cube coord and its subcube coordinate which is 
             # at the centre of the cube, (so this is len(subcube_slice)/2)
             # centre is the centre coords in the full cube coordinates
-            pixel_shift = [centre[1] - len(subcube.data[0])/2,centre[0] - len(subcube.data[0])/2]
+            if len(subcube.data[0])%2 == 0:
+                pixel_shift = [centre_coord[1] - len(subcube.data[0])/2,centre_coord[0] - len(subcube.data[0])/2]
+            else:
+                # if the width of the subcube is odd, must add one so that pixel shift is an integer
+                pixel_shift = [centre_coord[1] - (len(subcube.data[0])+1)/2,centre_coord[0] - (len(subcube.data[0])+1)/2]
+            
+            # initialising array
+            shifted_mask_centre = [0,0]
             
             # the mask centre in the subcube is then the centre coordinate in the full cube coordinates minus the pixel_shift
-            mask_centre[0] = mask_centre[0] - pixel_shift[0]
-            mask_centre[1] = mask_centre[1] - pixel_shift[1]
+            # must subtract by 1 because QFitsview indexes from 1
+            shifted_mask_centre[0] = mask_centre[0] - pixel_shift[0] - 1
+            shifted_mask_centre[1] = mask_centre[1] - pixel_shift[1] - 1
             
             # mask extents actually have to be input as (x,y), though I thought this would be confusing to input as the rest is (y,x) so need to change it here
-            mask_extent = [mask_extents[i][1],mask_extents[i][0]]
-            
-            if larger_subcube:
-                # to fit the mask to the correct position in larger subcube, needs to be shifted by pixels_larger 
-                # as the origin position shifts by 30 pixels in both x and y
-                mask_centre = [mask_centre[0]+pixels_larger,mask_centre[1]+pixels_larger]
+            # also have to add 0.5 to each so the mask extends mask_extent pixels from the mask_centre
+            mask_extent = [mask_extents[i][1]+0.5,mask_extents[i][0]+0.5]
             
             # I set the rotation to 0, but if need it can implement it by lettting user change 0 to something else
             # unit_center and unit_radius are set to None so the centre and extent values have units of pixels
-            subcube.mask_ellipse(mask_centre,mask_extent,0,unit_center = None, unit_radius = None)
-        pass
+            subcube.mask_ellipse(shifted_mask_centre,mask_extent,0,unit_center = None, unit_radius = None)
     
     
     # saving subcube
@@ -129,7 +144,6 @@ def create_subcube(image_name:str, centre:[int,int], length_coord:[int,int], sub
         save_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/data_cubes/"+image_name+"_larger_subcube.fits"
     else:
         save_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/data_cubes/"+image_name+"_subcube.fits"
-    
     subcube.sum(axis=0).plot()
     plt.show()
     subcube.write(save_name,savemask='nan')
