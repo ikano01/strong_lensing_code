@@ -117,10 +117,12 @@ def create_subcube(image_name:str, centre:[int,int], length:[int,int], subtype:s
             # at the centre of the cube, (so this is len(subcube_slice)/2)
             # centre is the centre coords in the full cube coordinates
             if len(subcube.data[0])%2 == 0:
-                pixel_shift = [centre_coord[1] - len(subcube.data[0])/2,centre_coord[0] - len(subcube.data[0])/2]
+                pixel_shift = [centre_coord[0] - len(subcube.data[0])/2,centre_coord[1] - len(subcube.data[0])/2]
+                print(pixel_shift)
+                print(len(subcube.data[0])/2)
             else:
                 # if the width of the subcube is odd, must add one so that pixel shift is an integer
-                pixel_shift = [centre_coord[1] - (len(subcube.data[0])+1)/2,centre_coord[0] - (len(subcube.data[0])+1)/2]
+                pixel_shift = [centre_coord[0] - (len(subcube.data[0])+1)/2,centre_coord[1] - (len(subcube.data[0])+1)/2]
             
             # initialising array
             shifted_mask_centre = [0,0]
@@ -137,6 +139,7 @@ def create_subcube(image_name:str, centre:[int,int], length:[int,int], subtype:s
             # I set the rotation to 0, but if need it can implement it by lettting user change 0 to something else
             # unit_center and unit_radius are set to None so the centre and extent values have units of pixels
             subcube.mask_ellipse(shifted_mask_centre,mask_extent,0,unit_center = None, unit_radius = None)
+            print('Creating mask centred at [y,x]: ',shifted_mask_centre)
     
     
     # saving subcube
