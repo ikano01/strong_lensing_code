@@ -48,7 +48,9 @@ def create_subcube(image_name:str, centre:[int,int], length:[int,int], subtype:s
     # Due qfitsview to indexing from 1, need to subtract 1 from the pixel count
     centre_coord[0] = centre[0] - 1
     centre_coord[1] = centre[1] - 1
-    length_extent = length - 1
+    
+    
+    length_extent = length
     
     # if larger_subcube, want to make length pixels_larger bigger
     if larger_subcube:
@@ -58,7 +60,7 @@ def create_subcube(image_name:str, centre:[int,int], length:[int,int], subtype:s
     if subtype == 'cube':
         # creating cubic subcube
         # input requires centre to be in degrees and size to be in arcsec
-        subcube = full_cube.subcube(center = centre_coord,size = length_extent, unit_center = None, unit_size = None)
+        subcube = full_cube.subcube(center = centre_coord,size = 2*length_extent, unit_center = None, unit_size = None)
     elif subtype == 'circle':
         # creating circle aperature subcube
         subcube = full_cube.subcube_circle_aperture(centre_deg,radius=length_arcsec)
@@ -74,15 +76,17 @@ def create_subcube(image_name:str, centre:[int,int], length:[int,int], subtype:s
             # all of the pixels in the subcube shifted coordinates when cropped from the subcube.
             # as the subcube is a square centered on the centre pixel and centre pixel in full cube coordinates is known
             # the pixel shift is the difference between the centre full cube coord and its subcube coordinate which is 
-            # at the centre of the cube, (so this is len(subcube_slice)/2)
+            # at the centre of the cube, (so this is len(subcube.data[0])/2)
             # centre is the centre coords in the full cube coordinates
+            # Also have to minus 1 because if len(subcube.data[0]) is 30, so len(subcube.data[0])/2 is 15, 
+            # but the point actually has an index of 14
+            ### Figure out why need to plus 1 - something to do with indexing from 1 ###
             if len(subcube.data[0])%2 == 0:
-                pixel_shift = [centre_coord[0] - len(subcube.data[0])/2,centre_coord[1] - len(subcube.data[0])/2]
-                print(pixel_shift)
-                print(len(subcube.data[0])/2)
+                pixel_shift = [centre_coord[0] - (len(subcube.data[0])/2-1),centre_coord[1] - (len(subcube.data[0])/2-1)]
             else:
                 # if the width of the subcube is odd, must add one so that pixel shift is an integer
-                pixel_shift = [centre_coord[0] - (len(subcube.data[0])+1)/2,centre_coord[1] - (len(subcube.data[0])+1)/2]
+                # Also have to minus 1 (see above)
+                pixel_shift = [centre_coord[0] - ((len(subcube.data[0])+1)/2-1),centre_coord[1] - ((len(subcube.data[0])+1)/2-1)]
             
             # initialising array
             shifted_mask_centre = [0,0]
@@ -99,7 +103,7 @@ def create_subcube(image_name:str, centre:[int,int], length:[int,int], subtype:s
             # I set the rotation to 0, but if need it can implement it by lettting user change 0 to something else
             # unit_center and unit_radius are set to None so the centre and extent values have units of pixels
             subcube.mask_ellipse(shifted_mask_centre,mask_extent,0,unit_center = None, unit_radius = None)
-            print('Creating mask centred at [y,x]: ',shifted_mask_centre)
+            print('Creating mask centred at [y,x]: ',shifted_mask_centre,' (when indexing from 0)')
     
     
     # saving subcube
