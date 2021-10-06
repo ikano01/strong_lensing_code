@@ -29,6 +29,9 @@ def fit_isophote(subcube_image_name: str,
     The isophote ellipses created from the larger subcube are then used by the smaller subcube to build the isophote models.
     
     Inputs:
+    init_ellipse:[float,float,float,float,float] where init_ellipse[0] is the y-coordinate of the centre of the ellipse,
+        init_ellipse[1] is the x-coordinate of the centre of the ellipse, init_ellipse[2] is the size of the semi-major axis,
+        init_ellipse[3] is the ratio between the semi-major and minor axes and init_ellipse[4] is the angle the ellipse is on in degrees
     
     DEFINITION:
         In this script, if larger_subcube == True, the variable names will be as expected, 
@@ -88,9 +91,11 @@ data_cubes/"+larger_subcube_image_name+".fits"
     with fits.open(larger_subcube_file_path) as hdu:
             # if larger_subcube == False, larger_subcube is equivalent to the subcube's data
             larger_subcube_data = hdu[1].data
+            # change the nans in the data to be 0 otherwise fitting didn't work
+            larger_subcube_data = np.nan_to_num(larger_subcube_data)
     
     # create initial guess ellipse
-    geometry = EllipseGeometry(x0=init_ellipse[0], y0=init_ellipse[1], 
+    geometry = EllipseGeometry(x0=init_ellipse[1], y0=init_ellipse[0], 
                                sma=init_ellipse[2], eps=init_ellipse[3], 
                                pa=np.deg2rad(init_ellipse[4]))
     
