@@ -34,15 +34,15 @@ def run(cube_name,centre,length, mask_cube = False, mask_centres = [], mask_exte
             check_init_ellipse = True,band='g', SN_threshold = 10)
         or
         run(cube_name='MAGPI1205',centre=[191,199], length=38,mask_cube=True,mask_centres=[[157,197],[211,226],[223,177],[238,200]],
-            mask_extents=[[13,16],[4,4],[7,7],[5,5]], pixels_larger=20,init_ellipse=[25, 25, 20, 0.1,0], 
-            check_init_ellipse = True,band='g', SN_threshold = 10)
+            mask_extents=[[13,16],[4,4],[7,7],[5,5]], pixels_larger=20,init_ellipse=[55, 55, 20, 0.1,0], 
+            check_init_ellipse = False,band='g', SN_threshold = 10)
     '''
     # if the cube should be masked maskmask_cube == True
     # create subcube
-    create_subcube(cube_name, centre, length,subtype = 'cube', larger_subcube = False, pixels_larger = pixels_larger, mask_cube = mask_cube, mask_centres = mask_centres,mask_extents = mask_extents)
+    create_subcube(cube_name, centre, length, larger_subcube = False, pixels_larger = pixels_larger, mask_cube = mask_cube, mask_centres = mask_centres,mask_extents = mask_extents)
     
     # create larger subcube
-    create_subcube(cube_name, centre, length,subtype = 'cube', larger_subcube = True, pixels_larger = pixels_larger, mask_cube = mask_cube, mask_centres = mask_centres,mask_extents = mask_extents)
+    create_subcube(cube_name, centre, length, larger_subcube = True, pixels_larger = pixels_larger, mask_cube = mask_cube, mask_centres = mask_centres,mask_extents = mask_extents)
 
     # create filters image of both cubes
     filter_im(cube_name+'_subcube')
