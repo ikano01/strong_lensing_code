@@ -1,9 +1,7 @@
 from mpdaf.obj import Cube
-from mpdaf.obj import WCS
-import astropy.units as u
 import matplotlib.pyplot as plt
 
-def create_subcube(image_name:str, centre:[int,int], length:[int,int], subtype:str = 'cube', 
+def create_subcube(image_name:str, centre:[int,int], length:[int,int], 
     mask_cube:bool = False, larger_subcube:bool = False, pixels_larger:int = 0, mask_centres:list = [], mask_extents:list = []):
     '''
     This function will create and save a new subcube.
@@ -21,17 +19,17 @@ def create_subcube(image_name:str, centre:[int,int], length:[int,int], subtype:s
     MPDAF images are stored in python arrays that are indexed in [y,x] axis order
     
     Examples:
-        create_subcube('MAGPI1201', [197,197], 59,subtype = 'cube')
+        create_subcube('MAGPI1201', [197,197], 59)
     or
-        create_subcube('MAGPI1501', [210,192], 53,subtype = 'cube')
+        create_subcube('MAGPI1501', [210,192], 53)
     or to create larger subcube cut
-        create_subcube('MAGPI1501', [210,192], 83,subtype = 'cube', larger_subcube = True, pixels_larger = 30)
+        create_subcube('MAGPI1501', [210,192], 83, larger_subcube = True, pixels_larger = 30)
     or
-        create_subcube('MAGPI1203', [197,197], 63,subtype = 'cube')
+        create_subcube('MAGPI1203', [197,197], 63)
     or a mask example
         create_subcube('MAGPI1203', [197,197], 93,mask_cube = True, mask_centres = [[161,198]],mask_extents = [[9,9]])
     or
-        create_subcube('MAGPI1508', [195,200], 40,subtype = 'cube')
+        create_subcube('MAGPI1508', [195,200], 40)
     '''
     
     # load in full cube
@@ -57,16 +55,8 @@ def create_subcube(image_name:str, centre:[int,int], length:[int,int], subtype:s
         # want to make length_extent[1] pixels_larger further from the centre
         length_extent += pixels_larger
     
-    if subtype == 'cube':
-        # creating cubic subcube
-        # input requires centre to be in degrees and size to be in arcsec
-        subcube = full_cube.subcube(center = centre_coord,size = 2*length_extent, unit_center = None, unit_size = None)
-    elif subtype == 'circle':
-        # creating circle aperature subcube
-        subcube = full_cube.subcube_circle_aperture(centre_deg,radius=length_arcsec)
-    else:
-        raise SyntaxError('Must specify sub_type of either cube or circle')
-        return    
+    # creating cubic subcube
+    subcube = full_cube.subcube(center = centre_coord,size = 2*length_extent, unit_center = None, unit_size = None)
     
     # masking the cube
     if mask_cube:
@@ -105,7 +95,6 @@ def create_subcube(image_name:str, centre:[int,int], length:[int,int], subtype:s
             subcube.mask_ellipse(shifted_mask_centre,mask_extent,0,unit_center = None, unit_radius = None)
             print('Creating mask centred at [y,x]: ',shifted_mask_centre,' (when indexing from 0)')
     
-    
     # saving subcube
     if larger_subcube:
         save_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/data_cubes/"+image_name+"_larger_subcube.fits"
@@ -113,4 +102,5 @@ def create_subcube(image_name:str, centre:[int,int], length:[int,int], subtype:s
         save_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/data_cubes/"+image_name+"_subcube.fits"
     subcube.sum(axis=0).plot()
     plt.show()
-    subcube.write(save_name,savemask='nan')
+    
+    subcube.write(save_name,savemask='nan',convert_float32 = False)
