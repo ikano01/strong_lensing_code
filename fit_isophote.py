@@ -8,6 +8,7 @@ from photutils.isophote import EllipseSample, Isophote, IsophoteList
 from astropy.io import fits
 from mpdaf.obj import Cube
 import time
+import scipy
 
 def fit_isophote(subcube_image_name: str, 
                  band: str, 
@@ -119,7 +120,6 @@ Isophote_initial_guess.png")
         # is fit_isophote_guess == False, just show the plots and nothing else
         plt.show()
     else:
-    # if fit_isophote_guess == True, don't show plots but continue
     
         # calculating isophotes from that initial guesss
         ellipse = Ellipse(pixel_intensities, geometry=geometry)
@@ -170,6 +170,23 @@ python files/data/"+larger_subcube_image_name+"/SDSS_"+band+"_band/noise_from_pr
 # =============================================================================
 #     create new model image from old isophote models but new intensities
 # =============================================================================
+
+        plt.figure()
+        # just print a single slice
+        plt.imshow(larger_subcube_data[2600], origin = 'lower',vmin=vmin,vmax=vmax)
+        plt.title('A slice of the unblurred image')
+        plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
+python files/data/"+larger_subcube_image_name+"/SDSS_"+band+"_band/unblurred_image.png")
+
+        # apply a median filter to further reduce noise
+        larger_subcube_data = scipy.ndimage.median_filter(larger_subcube_data, size=(60, 1,1))
+        
+        plt.figure()
+        # just print a single slice
+        plt.imshow(larger_subcube_data[2600], origin = 'lower',vmin=vmin,vmax=vmax)
+        plt.title('A slice of the median blurred image')
+        plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
+python files/data/"+larger_subcube_image_name+"/SDSS_"+band+"_band/median_blurred_image.png")
         
         # if want to print all wavelengths
         wavelength_indexes = range(len(larger_subcube_data))
