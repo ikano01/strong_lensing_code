@@ -1,5 +1,6 @@
 from mpdaf.obj import Cube
 import matplotlib.pyplot as plt
+import gc
 
 def create_subcube(image_name:str, centre:[int,int], length:[int,int], 
     mask_cube:bool = False, larger_subcube:bool = False, pixels_larger:int = 0, mask_centres:list = [], mask_extents:list = []):
@@ -12,7 +13,7 @@ def create_subcube(image_name:str, centre:[int,int], length:[int,int],
         length:int is the radius in pixels to cut to (so the whole cube has side lengths of 2*length)
         mask_cube:bool if True adds a mask to the subcube
         mask_centres:list is a list of lists which each correspond to the [y,x] centre of a mask to be placed on the full cube
-        mask_extents:list is a list of lists which each correspond to the [y,x] extents of the mask to be placed on the full cube
+        mask_extents:list is a list of lists which each correspond to the [y,x] radii of the mask to be placed on the full cube
         larger_subcube:bool if True, this will save the subcube with _larger added to the filename
         pixels_larger:int is the number of pixels wider and higher on each side the new subcube should be
     
@@ -58,6 +59,11 @@ def create_subcube(image_name:str, centre:[int,int], length:[int,int],
     # creating cubic subcube
     subcube = full_cube.subcube(center = centre_coord,size = 2*length_extent, unit_center = None, unit_size = None)
     
+    # as full_cube no longer needed, delete to save space
+    del full_cube
+    # gc.collect() clears the variable from memory
+    gc.collect()
+    
     # masking the cube
     if mask_cube:
         for i,mask_centre in enumerate(mask_centres):
@@ -100,7 +106,13 @@ def create_subcube(image_name:str, centre:[int,int], length:[int,int],
         save_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/data_cubes/"+image_name+"_larger_subcube.fits"
     else:
         save_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/data_cubes/"+image_name+"_subcube.fits"
+    
+    plt.figure()
     subcube.sum(axis=0).plot()
     plt.show()
     
     subcube.write(save_name,savemask='nan',convert_float32 = False)
+    # delete the subcube to save space
+    del subcube
+    # gc.collect() clears the variable from memory
+    gc.collect()
