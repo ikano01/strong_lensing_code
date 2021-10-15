@@ -178,13 +178,16 @@ python files/data/"+larger_subcube_image_name+"/SDSS_"+band+"_band/noise_from_pr
         plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
 python files/data/"+larger_subcube_image_name+"/SDSS_"+band+"_band/unblurred_image.png")
 
-        # apply a median filter to further reduce noise
-        larger_subcube_data = scipy.ndimage.median_filter(larger_subcube_data, size=(60, 1,1))
+        # create copy of cube and apply a median filter to further reduce noise
+        larger_subcube_filtered = scipy.ndimage.median_filter(larger_subcube_data, size=(60, 1,1))
+        
+        # then subtracting this filtered image from the larger subcube
+        larger_subcube_data = larger_subcube_data - larger_subcube_filtered
         
         plt.figure()
         # just print a single slice
         plt.imshow(larger_subcube_data[2600], origin = 'lower',vmin=vmin,vmax=vmax)
-        plt.title('A slice of the median blurred image')
+        plt.title('A slice of the image with the median blur subtracted')
         plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
 python files/data/"+larger_subcube_image_name+"/SDSS_"+band+"_band/median_blurred_image.png")
         
