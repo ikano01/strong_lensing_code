@@ -118,7 +118,9 @@ Isophote_initial_guess.png")
 
     if not fit_isophote_guess:
         # is fit_isophote_guess == False, just show the plots and nothing else
-        plt.show()
+        # comment 'pass' and uncomment to see the isophote image whilst running
+        #plt.show()
+        pass
     else:
     
         # calculating isophotes from that initial guesss
@@ -178,11 +180,11 @@ python files/data/"+larger_subcube_image_name+"/SDSS_"+band+"_band/noise_from_pr
         plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
 python files/data/"+larger_subcube_image_name+"/SDSS_"+band+"_band/unblurred_image.png")
 
-        # create copy of cube and apply a median filter to further reduce noise
+        # create copy of cube and apply a median filter for each pixel over 60 wavelength slices to further reduce noise
         larger_subcube_filtered = scipy.ndimage.median_filter(larger_subcube_data, size=(60, 1,1))
         
         # then subtracting this filtered image from the larger subcube
-        larger_subcube_data = larger_subcube_data - larger_subcube_filtered
+        larger_subcube_data -= larger_subcube_filtered
         
         plt.figure()
         # just print a single slice
@@ -190,9 +192,6 @@ python files/data/"+larger_subcube_image_name+"/SDSS_"+band+"_band/unblurred_ima
         plt.title('A slice of the image with the median blur subtracted')
         plt.savefig("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/\
 python files/data/"+larger_subcube_image_name+"/SDSS_"+band+"_band/median_blurred_image.png")
-        
-        # if want to print all wavelengths
-        wavelength_indexes = range(len(larger_subcube_data))
         
         # opening subcube as Cube type
         cube_Cube_format = Cube("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
@@ -202,12 +201,20 @@ data/data_cubes/"+subcube_image_name+".fits")
         # data_init and var_init initialise hdu[1] and hdu[2] to be filled
         residual_cube = cube_Cube_format.clone(data_init = np.zeros, var_init = np.zeros)
         
+        # if want to print all wavelengths
+        wavelength_indexes = range(len(larger_subcube_data))
+        #wavelength_indexes = [1860]
+        
         # if larger_subcube = True, also need the data from the smaller 
         #subcube so can subtract the model from as do not have it yet
         if larger_subcube:
             with fits.open("C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/\
 data/data_cubes/"+subcube_image_name+".fits") as hdu:
                 subcube_data = hdu[1].data
+                
+                # need to also blur the smaller subcube
+                subcube_filtered = scipy.ndimage.median_filter(subcube_data, size=(60, 1,1))
+                subcube_data -= subcube_filtered
             
             # also need to find distance to crop the larger subcube
             # distance to crop larger cube to make it same as smaller cube
