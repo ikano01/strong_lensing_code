@@ -107,9 +107,10 @@ def create_subcube(image_name:str, centre:[int,int], length:[int,int],
     else:
         save_name = "C:/Users/isaac/Documents/Uni_2021/Sem_2/ASTR3005/data/data_cubes/"+image_name+"_subcube.fits"
     
-    plt.figure()
-    subcube.sum(axis=0).plot()
-    plt.show()
+    # uncomment if want to see an example of the subcube
+    #plt.figure()
+    #subcube.sum(axis=0).plot()
+    #plt.show()
     
     subcube.write(save_name,savemask='nan',convert_float32 = False)
     # delete the subcube to save space
