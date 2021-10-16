@@ -95,7 +95,8 @@ python files/data/'+image_name
     im_z.plot(ax=axs[1,1], title='SDSS_z',zscale = True)
     
     plt.savefig(save_path+'/broadband_im.png')
-    plt.show()
+    # uncomment if want to see the filtered image whilst running
+    #plt.show()
     
     if plot_single == True:
         if band not in ['g','r','i','z']:
