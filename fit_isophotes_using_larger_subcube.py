@@ -15,7 +15,7 @@ def run(cube_name,centre,length, mask_cube = False, mask_centres = [], mask_exte
         length:int is the radius in pixels to cut to (so the whole cube has side lengths of 2*length)
         mask_cube:bool if True adds a mask to the subcube
         mask_centres:list is a list of lists which each correspond to the [y,x] centre of a mask to be placed on the full cube
-        mask_extents:list is a list of lists which each correspond to the [y,x] extents of the mask to be placed on the full cube - Can measure number of pixels using Qfitsview by pressing p
+        mask_extents:list is a list of lists which each correspond to the [y,x] radii of the mask to be placed on the full cube - Can measure number of pixels using Qfitsview by pressing p
         pixels_larger:int is the number of pixels larger the larger subcube should be from the length_coord
         init_ellipse: (int,int,int,float,float) is the equestion for the initial ellipse guess for the larger subcube
         check_init_ellipse: bool if check_init_ellipse == True, the isophotes will not be subtracted straight away and instead 
@@ -34,7 +34,7 @@ def run(cube_name,centre,length, mask_cube = False, mask_centres = [], mask_exte
             check_init_ellipse = True,band='g', SN_threshold = 10)
         or
         run(cube_name='MAGPI1205',centre=[191,199], length=38,mask_cube=True,mask_centres=[[157,197],[211,226],[223,177],[238,200]],
-            mask_extents=[[13,16],[4,4],[7,7],[5,5]], pixels_larger=20,init_ellipse=[55, 55, 20, 0.1,0], 
+            mask_extents=[[13,16],[4,4],[7,7],[5,5]], pixels_larger=20,init_ellipse=[57, 55, 20, 0.1,0], 
             check_init_ellipse = False,band='g', SN_threshold = 10)
     '''
     # if the cube should be masked maskmask_cube == True
