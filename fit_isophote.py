@@ -118,9 +118,7 @@ Isophote_initial_guess.png")
 
     if not fit_isophote_guess:
         # is fit_isophote_guess == False, just show the plots and nothing else
-        # comment 'pass' and uncomment to see the isophote image whilst running
-        #plt.show()
-        pass
+        plt.show()
     else:
     
         # calculating isophotes from that initial guesss
